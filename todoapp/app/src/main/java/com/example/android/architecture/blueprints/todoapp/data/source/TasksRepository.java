@@ -30,7 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
+import rx.functions.Action0;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
@@ -122,6 +124,50 @@ public class TasksRepository implements TasksDataSource {
                     getTasksFromRemoteDataSource(callback);
                 }
             });
+        }
+    }
+
+    /**
+     * Gets tasks from cache, local data source (SQLite) or remote data source, whichever is
+     * available first.
+     */
+    @Override
+    public Observable<List<Task>> getTasks() {
+        // Respond immediately with cache if available and not dirty
+        if (mCachedTasks != null && !mCacheIsDirty) {
+            return Observable.from(mCachedTasks.values()).toList();
+        } else if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
+        }
+
+        Observable<List<Task>> remoteTasks = mTasksRemoteDataSource
+                .getTasks()
+                .flatMap(new Func1<List<Task>, Observable<Task>>() {
+                    @Override
+                    public Observable<Task> call(List<Task> tasks) {
+                        return Observable.from(tasks);
+                    }
+                })
+                .doOnNext(new Action1<Task>() {
+                    @Override
+                    public void call(Task task) {
+                        mTasksLocalDataSource.saveTask(task);
+                        mCachedTasks.put(task.getId(), task);
+                    }
+                })
+                .toList()
+                .doOnCompleted(new Action0() {
+                    @Override
+                    public void call() {
+                        mCacheIsDirty = false;
+                    }
+                });
+        if (mCacheIsDirty) {
+            return remoteTasks;
+        } else {
+            // Query the local storage if available. If not, query the network.
+            Observable<List<Task>> localTasks = mTasksLocalDataSource.getTasks();
+            return Observable.concat(localTasks, remoteTasks).first();
         }
     }
 

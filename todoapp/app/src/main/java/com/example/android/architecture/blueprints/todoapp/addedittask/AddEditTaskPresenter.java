@@ -44,8 +44,6 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
 
     private final SaveTask mSaveTask;
 
-    private final UseCaseHandler mUseCaseHandler;
-
     private final CompositeSubscription mSubscriptions;
 
     @Nullable
@@ -57,10 +55,9 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
      * @param taskId      ID of the task to edit or null for a new task
      * @param addTaskView the add/edit view
      */
-    public AddEditTaskPresenter(@NonNull UseCaseHandler useCaseHandler, @Nullable String taskId,
+    public AddEditTaskPresenter(@Nullable String taskId,
             @NonNull AddEditTaskContract.View addTaskView, @NonNull GetTask getTask,
             @NonNull SaveTask saveTask) {
-        mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
         mTaskId = taskId;
         mAddTaskView = checkNotNull(addTaskView, "addTaskView cannot be null!");
         mGetTask = checkNotNull(getTask, "getTask cannot be null!");

@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase
 
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
+import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.base.domain.error.DataNotAvailableError;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -29,48 +29,47 @@ import com.example.android.architecture.blueprints.todoapp.tasks.domain.filter.T
 
 import java.util.List;
 
+import rx.Observable;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Fetches the list of tasks.
  */
-public class GetTasks extends UseCaseOld<GetTasks.RequestValues, GetTasks.ResponseValue> {
+public class GetTasks extends UseCase<GetTasks.RequestValues,GetTasks.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
     private final FilterFactory mFilterFactory;
 
     public GetTasks(@NonNull TasksRepository tasksRepository, @NonNull FilterFactory filterFactory) {
+        super(Schedulers.io());
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mFilterFactory = checkNotNull(filterFactory, "filterFactory cannot be null!");
     }
 
     @Override
-    protected void executeUseCase(final RequestValues values) {
+    protected Observable<ResponseValue> executeUseCase(final RequestValues values) {
         if (values.isForceUpdate()) {
             mTasksRepository.refreshTasks();
         }
 
-        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
+        return mTasksRepository.getTasks().map(new Func1<List<Task>, ResponseValue>() {
             @Override
-            public void onTasksLoaded(List<Task> tasks) {
+            public ResponseValue call(List<Task> tasks) {
                 TasksFilterType currentFiltering = values.getCurrentFiltering();
                 TaskFilter taskFilter = mFilterFactory.create(currentFiltering);
 
                 List<Task> tasksFiltered = taskFilter.filter(tasks);
-                ResponseValue responseValue = new ResponseValue(tasksFiltered);
-                getUseCaseCallback().onSuccess(responseValue);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                getUseCaseCallback().onError(new DataNotAvailableError());
+                return new ResponseValue(tasksFiltered);
             }
         });
 
     }
 
-    public static final class RequestValues implements UseCaseOld.RequestValues {
+    public static final class RequestValues implements UseCase.RequestValues {
 
         private final TasksFilterType mCurrentFiltering;
         private final boolean mForceUpdate;
@@ -89,7 +88,7 @@ public class GetTasks extends UseCaseOld<GetTasks.RequestValues, GetTasks.Respon
         }
     }
 
-    public static final class ResponseValue implements UseCaseOld.ResponseValue {
+    public static final class ResponseValue implements UseCase.ResponseValue {
 
         private final List<Task> mTasks;
 

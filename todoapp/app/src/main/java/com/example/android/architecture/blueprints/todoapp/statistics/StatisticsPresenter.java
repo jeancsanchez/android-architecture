@@ -28,6 +28,10 @@ import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.
 
 import java.util.List;
 
+import rx.Observer;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
+
 /**
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
  * the UI as required.
@@ -35,18 +39,18 @@ import java.util.List;
 public class StatisticsPresenter implements StatisticsContract.Presenter {
 
     private final StatisticsContract.View mStatisticsView;
-    private final UseCaseHandler mUseCaseHandler;
     private final GetTasks mGetTasks;
 
+    private final CompositeSubscription mSubscriptions;
+
     public StatisticsPresenter(
-            @NonNull UseCaseHandler useCaseHandler,
             @NonNull StatisticsContract.View statisticsView,
             @NonNull GetTasks getTasks) {
-        mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
         mGetTasks = checkNotNull(getTasks,"getTasks cannot be null!");
 
         mStatisticsView.setPresenter(this);
+        mSubscriptions = new CompositeSubscription();
     }
 
     @Override
@@ -56,16 +60,31 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
 
     @Override
     public void unsubscribe() {
-
+        mSubscriptions.unsubscribe();
     }
 
     private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
-        mUseCaseHandler.execute(mGetTasks, new GetTasks.RequestValues(false,
-                TasksFilterType.ALL_TASKS), new UseCaseOld.UseCaseCallback<GetTasks.ResponseValue>() {
+        Subscription subscription = mGetTasks.run(new GetTasks.RequestValues(false,
+                TasksFilterType.ALL_TASKS)).subscribe(new Observer<GetTasks.ResponseValue>() {
             @Override
-            public void onSuccess(GetTasks.ResponseValue response) {
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                // The view may not be able to handle UI updates anymore
+                if (!mStatisticsView.isActive()) {
+                    return;
+                }
+                mStatisticsView.showLoadingStatisticsError();
+
+            }
+
+            @Override
+            public void onNext(GetTasks.ResponseValue response) {
                 int activeTasks = 0;
                 int completedTasks = 0;
 
@@ -87,15 +106,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
 
                 mStatisticsView.showStatistics(activeTasks, completedTasks);
             }
-
-            @Override
-            public void onError(Error error) {
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
-                    return;
-                }
-                mStatisticsView.showLoadingStatisticsError();
-            }
         });
+        mSubscriptions.add(subscription);
     }
 }

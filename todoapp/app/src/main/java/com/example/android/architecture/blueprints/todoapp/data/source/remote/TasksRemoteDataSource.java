@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -78,6 +79,14 @@ public class TasksRemoteDataSource implements TasksDataSource {
                 callback.onTasksLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values()));
             }
         }, SERVICE_LATENCY_IN_MILLIS);
+    }
+
+    @Override
+    public Observable<List<Task>> getTasks() {
+        return Observable
+                .from(TASKS_SERVICE_DATA.values())
+                .delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS)
+                .toList();
     }
 
     /**

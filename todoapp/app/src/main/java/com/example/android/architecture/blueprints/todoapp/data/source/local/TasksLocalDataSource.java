@@ -122,6 +122,19 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     }
 
+    @Override
+    public Observable<List<Task>> getTasks() {
+        String[] projection = {
+                TaskEntry.COLUMN_NAME_ENTRY_ID,
+                TaskEntry.COLUMN_NAME_TITLE,
+                TaskEntry.COLUMN_NAME_DESCRIPTION,
+                TaskEntry.COLUMN_NAME_COMPLETED
+        };
+        String sql = String.format("SELECT %s FROM %s", TextUtils.join(",", projection), TaskEntry.TABLE_NAME);
+        return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql)
+                .mapToList(mTaskMapperFunction);
+    }
+
     /**
      * Note: {@link GetTaskCallback#onDataNotAvailable()} is fired if the {@link Task} isn't
      * found.

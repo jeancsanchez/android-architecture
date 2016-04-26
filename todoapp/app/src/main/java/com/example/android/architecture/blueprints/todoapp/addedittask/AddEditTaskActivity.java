@@ -71,8 +71,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        new AddEditTaskPresenter(Injection.provideUseCaseHandler(),
-                taskId,
+        new AddEditTaskPresenter(taskId,
                 addEditTaskFragment,
                 Injection.provideGetTask(getApplicationContext()),
                 Injection.provideSaveTask(getApplicationContext())

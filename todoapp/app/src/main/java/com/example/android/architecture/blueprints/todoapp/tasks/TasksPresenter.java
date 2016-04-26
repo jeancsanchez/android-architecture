@@ -33,6 +33,10 @@ import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.
 
 import java.util.List;
 
+import rx.Observer;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
+
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
  * UI as required.
@@ -52,6 +56,8 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     private final UseCaseHandler mUseCaseHandler;
 
+    private final CompositeSubscription mSubscriptions;
+
     public TasksPresenter(@NonNull UseCaseHandler useCaseHandler,
             @NonNull TasksContract.View tasksView, @NonNull GetTasks getTasks,
             @NonNull CompleteTask completeTask, @NonNull ActivateTask activateTask,
@@ -66,6 +72,7 @@ public class TasksPresenter implements TasksContract.Presenter {
 
 
         mTasksView.setPresenter(this);
+        mSubscriptions = new CompositeSubscription();
     }
 
     @Override
@@ -75,7 +82,7 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     @Override
     public void unsubscribe() {
-
+        mSubscriptions.unsubscribe();
     }
 
     @Override
@@ -106,31 +113,36 @@ public class TasksPresenter implements TasksContract.Presenter {
         GetTasks.RequestValues requestValue = new GetTasks.RequestValues(forceUpdate,
                 mCurrentFiltering);
 
-        mUseCaseHandler.execute(mGetTasks, requestValue,
-                new UseCaseOld.UseCaseCallback<GetTasks.ResponseValue>() {
-                    @Override
-                    public void onSuccess(GetTasks.ResponseValue response) {
-                        List<Task> tasks = response.getTasks();
-                        // The view may not be able to handle UI updates anymore
-                        if (!mTasksView.isActive()) {
-                            return;
-                        }
-                        if (showLoadingUI) {
-                            mTasksView.setLoadingIndicator(false);
-                        }
+        Subscription subscription = mGetTasks.run(requestValue).subscribe(new Observer<GetTasks.ResponseValue>() {
+            @Override
+            public void onCompleted() {
 
-                        processTasks(tasks);
-                    }
+            }
 
-                    @Override
-                    public void onError(Error error) {
-                        // The view may not be able to handle UI updates anymore
-                        if (!mTasksView.isActive()) {
-                            return;
-                        }
-                        mTasksView.showLoadingTasksError();
-                    }
-                });
+            @Override
+            public void onError(Throwable e) {
+                // The view may not be able to handle UI updates anymore
+                if (!mTasksView.isActive()) {
+                    return;
+                }
+                mTasksView.showLoadingTasksError();
+            }
+
+            @Override
+            public void onNext(GetTasks.ResponseValue response) {
+                List<Task> tasks = response.getTasks();
+                // The view may not be able to handle UI updates anymore
+                if (!mTasksView.isActive()) {
+                    return;
+                }
+                if (showLoadingUI) {
+                    mTasksView.setLoadingIndicator(false);
+                }
+
+                processTasks(tasks);
+            }
+        });
+        mSubscriptions.add(subscription);
     }
 
     private void processTasks(List<Task> tasks) {

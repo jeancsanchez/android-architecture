@@ -71,6 +71,7 @@ public interface TasksDataSource {
 
     void deleteTask(@NonNull String taskId);
 
+    Observable<List<Task>> getTasks();
 
     Observable<Task> getTask(@NonNull String taskId);
 }

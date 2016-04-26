@@ -133,6 +133,6 @@ public class StatisticsPresenterTest {
         UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
         GetTasks getTasks = new GetTasks(mTasksRepository, new FilterFactory());
 
-        return new StatisticsPresenter(useCaseHandler, mStatisticsView, getTasks);
+        return new StatisticsPresenter(mStatisticsView, getTasks);
     }
 }
