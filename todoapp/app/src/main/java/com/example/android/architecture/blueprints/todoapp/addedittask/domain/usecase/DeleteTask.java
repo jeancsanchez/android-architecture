@@ -18,32 +18,42 @@ package com.example.android.architecture.blueprints.todoapp.addedittask.domain.u
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Deletes a {@link Task} from the {@link TasksRepository}.
  */
-public class DeleteTask extends UseCaseOld<DeleteTask.RequestValues, DeleteTask.ResponseValue> {
+public class DeleteTask extends UseCase<DeleteTask.RequestValues, DeleteTask.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
     public DeleteTask(@NonNull TasksRepository tasksRepository) {
+        super(Schedulers.io());
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
     }
 
     @Override
-    protected void executeUseCase(final RequestValues values) {
-        mTasksRepository.deleteTask(values.getTaskId());
-        getUseCaseCallback().onSuccess(new ResponseValue());
+    protected Observable<ResponseValue> executeUseCase(final RequestValues values) {
+        return Observable.create(new Observable.OnSubscribe<ResponseValue>() {
+            @Override
+            public void call(Subscriber<? super ResponseValue> subscriber) {
+                mTasksRepository.deleteTask(values.getTaskId());
+                subscriber.onNext(new ResponseValue());
+                subscriber.onCompleted();
+            }
+        });
     }
 
-
-
-    public static final class RequestValues implements UseCaseOld.RequestValues {
+    public static final class RequestValues implements UseCase.RequestValues {
         private final String mTaskId;
 
         public RequestValues(@NonNull String taskId) {
@@ -55,5 +65,5 @@ public class DeleteTask extends UseCaseOld<DeleteTask.RequestValues, DeleteTask.
         }
     }
 
-    public static final class ResponseValue implements UseCaseOld.ResponseValue { }
+    public static final class ResponseValue implements UseCase.ResponseValue { }
 }

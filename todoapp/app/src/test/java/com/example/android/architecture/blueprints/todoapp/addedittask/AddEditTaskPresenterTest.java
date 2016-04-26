@@ -130,7 +130,7 @@ public class AddEditTaskPresenterTest {
         GetTask getTask = new GetTask(mTasksRepository);
         SaveTask saveTask = new SaveTask(mTasksRepository);
 
-        return new AddEditTaskPresenter(useCaseHandler, taskId, mAddEditTaskView, getTask,
+        return new AddEditTaskPresenter(taskId, mAddEditTaskView, getTask,
                 saveTask);
     }
 }

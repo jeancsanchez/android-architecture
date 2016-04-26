@@ -52,12 +52,12 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     private String mTaskId;
 
     public TaskDetailPresenter(@NonNull UseCaseHandler useCaseHandler,
-            @Nullable String taskId,
-            @NonNull TaskDetailContract.View taskDetailView,
-            @NonNull GetTask getTask,
-            @NonNull CompleteTask completeTask,
-            @NonNull ActivateTask activateTask,
-            @NonNull DeleteTask deleteTask) {
+                               @Nullable String taskId,
+                               @NonNull TaskDetailContract.View taskDetailView,
+                               @NonNull GetTask getTask,
+                               @NonNull CompleteTask completeTask,
+                               @NonNull ActivateTask activateTask,
+                               @NonNull DeleteTask deleteTask) {
         mTaskId = taskId;
         mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
@@ -133,18 +133,24 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     @Override
     public void deleteTask() {
-        mUseCaseHandler.execute(mDeleteTask, new DeleteTask.RequestValues(mTaskId),
-                new UseCaseOld.UseCaseCallback<DeleteTask.ResponseValue>() {
+        Subscription subscription = mDeleteTask.run(new DeleteTask.RequestValues(mTaskId))
+                .subscribe(new Observer<DeleteTask.ResponseValue>() {
                     @Override
-                    public void onSuccess(DeleteTask.ResponseValue response) {
-                        mTaskDetailView.showTaskDeleted();
+                    public void onCompleted() {
+
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError(Throwable e) {
                         // Show error, log, etc.
                     }
+
+                    @Override
+                    public void onNext(DeleteTask.ResponseValue responseValue) {
+                        mTaskDetailView.showTaskDeleted();
+                    }
                 });
+        mSubscriptions.add(subscription);
     }
 
     @Override
