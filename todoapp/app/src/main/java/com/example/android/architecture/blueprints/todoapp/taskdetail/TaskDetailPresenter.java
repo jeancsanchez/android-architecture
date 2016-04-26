@@ -160,18 +160,24 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             return;
         }
 
-        mUseCaseHandler.execute(mCompleteTask, new CompleteTask.RequestValues(mTaskId),
-                new UseCaseOld.UseCaseCallback<CompleteTask.ResponseValue>() {
+        Subscription subscription = mCompleteTask.run(new CompleteTask.RequestValues(mTaskId))
+                .subscribe(new Observer<CompleteTask.ResponseValue>() {
                     @Override
-                    public void onSuccess(CompleteTask.ResponseValue response) {
-                        mTaskDetailView.showTaskMarkedComplete();
+                    public void onCompleted() {
+
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError(Throwable e) {
                         // Show error, log, etc.
                     }
+
+                    @Override
+                    public void onNext(CompleteTask.ResponseValue responseValue) {
+                        mTaskDetailView.showTaskMarkedComplete();
+                    }
                 });
+        mSubscriptions.add(subscription);
     }
 
     @Override

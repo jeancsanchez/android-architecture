@@ -199,20 +199,25 @@ public class TasksPresenter implements TasksContract.Presenter {
     @Override
     public void completeTask(@NonNull Task completedTask) {
         checkNotNull(completedTask, "completedTask cannot be null!");
-        mUseCaseHandler.execute(mCompleteTask, new CompleteTask.RequestValues(
-                        completedTask.getId()),
-                new UseCaseOld.UseCaseCallback<CompleteTask.ResponseValue>() {
-                    @Override
-                    public void onSuccess(CompleteTask.ResponseValue response) {
-                        mTasksView.showTaskMarkedComplete();
-                        loadTasks(false, false);
-                    }
+        Subscription subscription = mCompleteTask.run(new CompleteTask.RequestValues(
+                completedTask.getId())).subscribe(new Observer<CompleteTask.ResponseValue>() {
+            @Override
+            public void onCompleted() {
 
-                    @Override
-                    public void onError(Error error) {
-                        mTasksView.showLoadingTasksError();
-                    }
-                });
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mTasksView.showLoadingTasksError();
+            }
+
+            @Override
+            public void onNext(CompleteTask.ResponseValue responseValue) {
+                mTasksView.showTaskMarkedComplete();
+                loadTasks(false, false);
+            }
+        });
+        mSubscriptions.add(subscription);
     }
 
     @Override
