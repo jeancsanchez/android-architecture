@@ -19,7 +19,6 @@ package com.example.android.architecture.blueprints.todoapp.addedittask.domain.u
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
-import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 

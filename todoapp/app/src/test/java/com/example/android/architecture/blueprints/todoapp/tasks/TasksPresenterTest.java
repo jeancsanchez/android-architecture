@@ -22,8 +22,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.android.architecture.blueprints.todoapp.TestUseCaseScheduler;
-import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
         .LoadTasksCallback;
@@ -84,13 +82,12 @@ public class TasksPresenterTest {
     }
 
     private TasksPresenter givenTasksPresenter() {
-        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
         GetTasks getTasks = new GetTasks(mTasksRepository, new FilterFactory());
         CompleteTask completeTask = new CompleteTask(mTasksRepository);
         ActivateTask activateTask = new ActivateTask(mTasksRepository);
         ClearCompleteTasks clearCompleteTasks = new ClearCompleteTasks(mTasksRepository);
 
-        return new TasksPresenter(useCaseHandler, mTasksView, getTasks, completeTask, activateTask,
+        return new TasksPresenter(mTasksView, getTasks, completeTask, activateTask,
                 clearCompleteTasks);
     }
 

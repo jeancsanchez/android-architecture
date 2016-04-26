@@ -19,7 +19,6 @@ package com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
-import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import rx.Observable;

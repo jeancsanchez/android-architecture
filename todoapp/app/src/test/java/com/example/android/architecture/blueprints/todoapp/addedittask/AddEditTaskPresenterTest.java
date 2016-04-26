@@ -21,8 +21,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.android.architecture.blueprints.todoapp.TestUseCaseScheduler;
-import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -126,7 +124,6 @@ public class AddEditTaskPresenterTest {
 
     private AddEditTaskPresenter givenEditTaskPresenter(String taskId) {
 
-        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
         GetTask getTask = new GetTask(mTasksRepository);
         SaveTask saveTask = new SaveTask(mTasksRepository);
 

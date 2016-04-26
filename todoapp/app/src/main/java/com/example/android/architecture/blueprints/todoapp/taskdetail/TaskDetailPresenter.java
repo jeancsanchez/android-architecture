@@ -21,8 +21,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
-import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.DeleteTask;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -40,7 +38,6 @@ import rx.subscriptions.CompositeSubscription;
 public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     private final TaskDetailContract.View mTaskDetailView;
-    private final UseCaseHandler mUseCaseHandler;
     private final GetTask mGetTask;
     private final CompleteTask mCompleteTask;
     private final ActivateTask mActivateTask;
@@ -51,15 +48,13 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Nullable
     private String mTaskId;
 
-    public TaskDetailPresenter(@NonNull UseCaseHandler useCaseHandler,
-                               @Nullable String taskId,
+    public TaskDetailPresenter(@Nullable String taskId,
                                @NonNull TaskDetailContract.View taskDetailView,
                                @NonNull GetTask getTask,
                                @NonNull CompleteTask completeTask,
                                @NonNull ActivateTask activateTask,
                                @NonNull DeleteTask deleteTask) {
         mTaskId = taskId;
-        mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
         mGetTask = checkNotNull(getTask, "getTask cannot be null!");
         mCompleteTask = checkNotNull(completeTask, "completeTask cannot be null!");

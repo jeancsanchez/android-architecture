@@ -21,8 +21,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
-import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -54,15 +52,11 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     private boolean mFirstLoad = true;
 
-    private final UseCaseHandler mUseCaseHandler;
-
     private final CompositeSubscription mSubscriptions;
 
-    public TasksPresenter(@NonNull UseCaseHandler useCaseHandler,
-            @NonNull TasksContract.View tasksView, @NonNull GetTasks getTasks,
+    public TasksPresenter(@NonNull TasksContract.View tasksView, @NonNull GetTasks getTasks,
             @NonNull CompleteTask completeTask, @NonNull ActivateTask activateTask,
             @NonNull ClearCompleteTasks clearCompleteTasks) {
-        mUseCaseHandler = checkNotNull(useCaseHandler, "usecaseHandler cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
         mGetTasks = checkNotNull(getTasks, "getTask cannot be null!");
         mCompleteTask = checkNotNull(completeTask, "completeTask cannot be null!");
@@ -246,19 +240,25 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     @Override
     public void clearCompletedTasks() {
-        mUseCaseHandler.execute(mClearCompleteTasks, new ClearCompleteTasks.RequestValues(),
-                new UseCaseOld.UseCaseCallback<ClearCompleteTasks.ResponseValue>() {
+        Subscription subscription = mClearCompleteTasks.run(new ClearCompleteTasks.RequestValues())
+                .subscribe(new Observer<ClearCompleteTasks.ResponseValue>() {
                     @Override
-                    public void onSuccess(ClearCompleteTasks.ResponseValue response) {
-                        mTasksView.showCompletedTasksCleared();
-                        loadTasks(false, false);
+                    public void onCompleted() {
+                        mTasksView.showLoadingTasksError();
                     }
 
                     @Override
-                    public void onError(Error error) {
-                        mTasksView.showLoadingTasksError();
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(ClearCompleteTasks.ResponseValue responseValue) {
+                        mTasksView.showCompletedTasksCleared();
+                        loadTasks(false, false);
                     }
                 });
+        mSubscriptions.add(subscription);
     }
 
     /**

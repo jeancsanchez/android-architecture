@@ -19,8 +19,6 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.android.architecture.blueprints.todoapp.TestUseCaseScheduler;
-import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -130,7 +128,7 @@ public class StatisticsPresenterTest {
     }
 
     private StatisticsPresenter givenStatisticsPresenter() {
-        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
+
         GetTasks getTasks = new GetTasks(mTasksRepository, new FilterFactory());
 
         return new StatisticsPresenter(mStatisticsView, getTasks);

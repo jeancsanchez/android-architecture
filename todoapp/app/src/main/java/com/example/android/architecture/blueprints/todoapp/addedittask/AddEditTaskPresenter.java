@@ -21,8 +21,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
-import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
 import com.example.android.architecture.blueprints.todoapp.data.Task;

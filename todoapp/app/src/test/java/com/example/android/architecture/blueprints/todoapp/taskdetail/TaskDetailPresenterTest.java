@@ -21,8 +21,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.android.architecture.blueprints.todoapp.TestUseCaseScheduler;
-import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.DeleteTask;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -195,13 +193,12 @@ public class TaskDetailPresenterTest {
     }
 
     private TaskDetailPresenter givenTaskDetailPresenter(String id) {
-        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
         GetTask getTask = new GetTask(mTasksRepository);
         CompleteTask completeTask = new CompleteTask(mTasksRepository);
         ActivateTask activateTask = new ActivateTask(mTasksRepository);
         DeleteTask deleteTask = new DeleteTask(mTasksRepository);
 
-        return new TaskDetailPresenter(useCaseHandler, id, mTaskDetailView,
+        return new TaskDetailPresenter(id, mTaskDetailView,
                 getTask, completeTask, activateTask, deleteTask);
     }
 

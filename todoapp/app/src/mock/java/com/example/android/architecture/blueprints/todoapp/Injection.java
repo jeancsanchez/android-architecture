@@ -51,10 +51,6 @@ public class Injection {
         return new GetTasks(provideTasksRepository(context), new FilterFactory());
     }
 
-    public static UseCaseHandler provideUseCaseHandler() {
-        return UseCaseHandler.getInstance();
-    }
-
     public static GetTask provideGetTask(@NonNull Context context) {
         return new GetTask(Injection.provideTasksRepository(context));
     }
