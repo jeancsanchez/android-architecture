@@ -174,18 +174,24 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mUseCaseHandler.execute(mActivateTask, new ActivateTask.RequestValues(mTaskId),
-                new UseCaseOld.UseCaseCallback<ActivateTask.ResponseValue>() {
+        Subscription subscription = mActivateTask.run(new ActivateTask.RequestValues(mTaskId))
+                .subscribe(new Observer<ActivateTask.ResponseValue>() {
                     @Override
-                    public void onSuccess(ActivateTask.ResponseValue response) {
-                        mTaskDetailView.showTaskMarkedActive();
+                    public void onCompleted() {
+
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError(Throwable e) {
                         // Show error, log, etc.
                     }
+
+                    @Override
+                    public void onNext(ActivateTask.ResponseValue responseValue) {
+                        mTaskDetailView.showTaskMarkedActive();
+                    }
                 });
+        mSubscriptions.add(subscription);
     }
 
     private void showTask(Task task) {

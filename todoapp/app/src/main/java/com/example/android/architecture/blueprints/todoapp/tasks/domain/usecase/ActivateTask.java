@@ -18,30 +18,43 @@ package com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Marks a task as active (not completed yet).
  */
-public class ActivateTask extends UseCaseOld<ActivateTask.RequestValues, ActivateTask.ResponseValue> {
+public class ActivateTask extends UseCase<ActivateTask.RequestValues, ActivateTask.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
     public ActivateTask(@NonNull TasksRepository tasksRepository) {
+        super(Schedulers.io());
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
     }
 
     @Override
-    protected void executeUseCase(final RequestValues values) {
-        String activeTask = values.getActivateTask();
-        mTasksRepository.activateTask(activeTask);
-        getUseCaseCallback().onSuccess(new ResponseValue());
+    protected Observable<ResponseValue> executeUseCase(final RequestValues values) {
+        return Observable.create(new Observable.OnSubscribe<ResponseValue>() {
+            @Override
+            public void call(Subscriber<? super ResponseValue> subscriber) {
+                String activeTask = values.getActivateTask();
+                mTasksRepository.activateTask(activeTask);
+                subscriber.onNext(new ResponseValue());
+                subscriber.onCompleted();
+            }
+        });
     }
 
-    public static final class RequestValues implements UseCaseOld.RequestValues {
+    public static final class RequestValues implements UseCase.RequestValues {
 
         private final String mActivateTask;
 
@@ -54,5 +67,5 @@ public class ActivateTask extends UseCaseOld<ActivateTask.RequestValues, Activat
         }
     }
 
-    public static final class ResponseValue implements UseCaseOld.ResponseValue { }
+    public static final class ResponseValue implements UseCase.ResponseValue { }
 }
