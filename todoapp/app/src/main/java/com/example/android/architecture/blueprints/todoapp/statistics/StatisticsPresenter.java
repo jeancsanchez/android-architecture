@@ -54,6 +54,11 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         loadStatistics();
     }
 
+    @Override
+    public void unsubscribe() {
+
+    }
+
     private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 

@@ -18,32 +18,44 @@ package com.example.android.architecture.blueprints.todoapp.addedittask.domain.u
 
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
+import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Updates or creates a new {@link Task} in the {@link TasksRepository}.
  */
-public class SaveTask extends UseCaseOld<SaveTask.RequestValues, SaveTask.ResponseValue> {
+public class SaveTask extends UseCase<SaveTask.RequestValues, SaveTask.ResponseValue> {
 
-    private final TasksRepository mTasksRepository;
+    private final TasksDataSource mTasksRepository;
 
-    public SaveTask(@NonNull TasksRepository tasksRepository) {
+    public SaveTask(@NonNull TasksDataSource tasksRepository) {
+        super(Schedulers.io());
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
     }
 
     @Override
-    protected void executeUseCase(final RequestValues values) {
-        Task task = values.getTask();
-        mTasksRepository.saveTask(task);
+    protected Observable<ResponseValue> executeUseCase(final RequestValues values) {
 
-        getUseCaseCallback().onSuccess(new ResponseValue(task));
+        return Observable.create(new Observable.OnSubscribe<ResponseValue>() {
+            @Override
+            public void call(Subscriber<? super ResponseValue> subscriber) {
+                Task task = values.getTask();
+                mTasksRepository.saveTask(task);
+                subscriber.onNext(new ResponseValue(task));
+                subscriber.onCompleted();
+            }
+        });
     }
 
-    public static final class RequestValues implements UseCaseOld.RequestValues {
+    public static final class RequestValues implements UseCase.RequestValues {
 
         private final Task mTask;
 
@@ -56,7 +68,7 @@ public class SaveTask extends UseCaseOld<SaveTask.RequestValues, SaveTask.Respon
         }
     }
 
-    public static final class ResponseValue implements UseCaseOld.ResponseValue {
+    public static final class ResponseValue implements UseCase.ResponseValue {
 
         private final Task mTask;
 

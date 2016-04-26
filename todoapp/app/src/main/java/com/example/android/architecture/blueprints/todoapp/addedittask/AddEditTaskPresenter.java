@@ -28,6 +28,8 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.domain.us
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 
 import rx.Observer;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and
@@ -43,6 +45,8 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     private final SaveTask mSaveTask;
 
     private final UseCaseHandler mUseCaseHandler;
+
+    private final CompositeSubscription mSubscriptions;
 
     @Nullable
     private String mTaskId;
@@ -63,6 +67,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
         mSaveTask = checkNotNull(saveTask, "saveTask cannot be null!");
 
         mAddTaskView.setPresenter(this);
+        mSubscriptions = new CompositeSubscription();
     }
 
     @Override
@@ -73,23 +78,17 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     }
 
     @Override
+    public void unsubscribe() {
+        mSubscriptions.unsubscribe();
+    }
+
+    @Override
     public void createTask(String title, String description) {
         Task newTask = new Task(title, description);
         if (newTask.isEmpty()) {
             mAddTaskView.showEmptyTaskError();
         } else {
-            mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
-                    new UseCaseOld.UseCaseCallback<SaveTask.ResponseValue>() {
-                        @Override
-                        public void onSuccess(SaveTask.ResponseValue response) {
-                            mAddTaskView.showTasksList();
-                        }
-
-                        @Override
-                        public void onError(Error error) {
-                            showSaveError();
-                        }
-                    });
+            saveTask(newTask);
         }
     }
 
@@ -99,19 +98,28 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
         Task newTask = new Task(title, description, mTaskId);
-        mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
-                new UseCaseOld.UseCaseCallback<SaveTask.ResponseValue>() {
+        saveTask(newTask);
+    }
+
+    private void saveTask(Task task) {
+        Subscription subscription = mSaveTask.run(new SaveTask.RequestValues(task))
+                .subscribe(new Observer<SaveTask.ResponseValue>() {
                     @Override
-                    public void onSuccess(SaveTask.ResponseValue response) {
-                        // After an edit, go back to the list.
-                        mAddTaskView.showTasksList();
+                    public void onCompleted() {
+
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError(Throwable e) {
                         showSaveError();
                     }
+
+                    @Override
+                    public void onNext(SaveTask.ResponseValue responseValue) {
+                        mAddTaskView.showTasksList();
+                    }
                 });
+        mSubscriptions.add(subscription);
     }
 
     @Override
@@ -120,7 +128,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
 
-        mGetTask.run(new GetTask.RequestValues(mTaskId)).subscribe(new Observer<GetTask.ResponseValue>() {
+        Subscription subscription = mGetTask.run(new GetTask.RequestValues(mTaskId)).subscribe(new Observer<GetTask.ResponseValue>() {
             @Override
             public void onCompleted() {
 
@@ -136,6 +144,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
                 showTask(response.getTask());
             }
         });
+        mSubscriptions.add(subscription);
     }
 
     private void showTask(Task task) {

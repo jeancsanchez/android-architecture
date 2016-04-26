@@ -64,11 +64,13 @@ public interface TasksDataSource {
 
     void clearCompletedTasks();
 
-    Observable<Task> getTask(@NonNull String taskId);
 
     void refreshTasks();
 
     void deleteAllTasks();
 
     void deleteTask(@NonNull String taskId);
+
+
+    Observable<Task> getTask(@NonNull String taskId);
 }

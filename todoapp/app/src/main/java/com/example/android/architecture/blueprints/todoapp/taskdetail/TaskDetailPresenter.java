@@ -30,6 +30,8 @@ import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.CompleteTask;
 
 import rx.Observer;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
@@ -43,6 +45,8 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     private final CompleteTask mCompleteTask;
     private final ActivateTask mActivateTask;
     private final DeleteTask mDeleteTask;
+
+    private final CompositeSubscription mSubscriptions;
 
     @Nullable
     private String mTaskId;
@@ -62,11 +66,17 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         mActivateTask = checkNotNull(activateTask, "activateTask cannot be null!");
         mDeleteTask = checkNotNull(deleteTask, "deleteTask cannot be null!");
         mTaskDetailView.setPresenter(this);
+        mSubscriptions = new CompositeSubscription();
     }
 
     @Override
     public void start() {
         openTask();
+    }
+
+    @Override
+    public void unsubscribe() {
+        mSubscriptions.unsubscribe();
     }
 
     private void openTask() {
@@ -77,7 +87,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
         mTaskDetailView.setLoadingIndicator(true);
 
-        mGetTask.run(new GetTask.RequestValues(mTaskId)).subscribe(new Observer<GetTask.ResponseValue>() {
+        Subscription subscription = mGetTask.run(new GetTask.RequestValues(mTaskId)).subscribe(new Observer<GetTask.ResponseValue>() {
             @Override
             public void onCompleted() {
 
@@ -108,6 +118,8 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
                 }
             }
         });
+
+        mSubscriptions.add(subscription);
     }
 
     @Override
