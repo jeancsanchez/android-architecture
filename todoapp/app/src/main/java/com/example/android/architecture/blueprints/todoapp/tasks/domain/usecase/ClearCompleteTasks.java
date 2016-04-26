@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase
 
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Deletes tasks marked as completed.
  */
 public class ClearCompleteTasks
-        extends UseCase<ClearCompleteTasks.RequestValues, ClearCompleteTasks.ResponseValue> {
+        extends UseCaseOld<ClearCompleteTasks.RequestValues, ClearCompleteTasks.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
@@ -41,7 +41,7 @@ public class ClearCompleteTasks
         getUseCaseCallback().onSuccess(new ResponseValue());
     }
 
-    public static class RequestValues implements UseCase.RequestValues { }
+    public static class RequestValues implements UseCaseOld.RequestValues { }
 
-    public static class ResponseValue implements UseCase.ResponseValue { }
+    public static class ResponseValue implements UseCaseOld.ResponseValue { }
 }

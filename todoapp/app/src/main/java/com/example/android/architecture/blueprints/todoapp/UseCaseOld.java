@@ -16,32 +16,39 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-
-import rx.Observable;
-import rx.Scheduler;
-import rx.android.schedulers.AndroidSchedulers;
-
 /**
  * Use cases are the entry points to the domain layer.
  *
  * @param <Q> the request type
  * @param <P> the response type
  */
-public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase.ResponseValue> {
+public abstract class UseCaseOld<Q extends UseCaseOld.RequestValues, P extends UseCaseOld.ResponseValue> {
 
-    private final Scheduler backgroundScheduler;
+    private Q mRequestValues;
 
-    protected UseCase(Scheduler backgroundScheduler) {
-        this.backgroundScheduler = backgroundScheduler;
+    private UseCaseCallback<P> mUseCaseCallback;
+
+    public void setRequestValues(Q requestValues) {
+        mRequestValues = requestValues;
     }
 
-    public Observable<P> run(Q requestValues) {
-        return executeUseCase(requestValues)
-                .subscribeOn(backgroundScheduler)
-                .observeOn(AndroidSchedulers.mainThread());
+    public Q getRequestValues() {
+        return mRequestValues;
     }
 
-    protected abstract Observable<P> executeUseCase(Q requestValues);
+    public UseCaseCallback<P> getUseCaseCallback() {
+        return mUseCaseCallback;
+    }
+
+    public void setUseCaseCallback(UseCaseCallback<P> useCaseCallback) {
+        mUseCaseCallback = useCaseCallback;
+    }
+
+    void run() {
+       executeUseCase(mRequestValues);
+    }
+
+    protected abstract void executeUseCase(Q requestValues);
 
     /**
      * Data passed to a request.

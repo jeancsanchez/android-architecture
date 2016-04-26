@@ -29,6 +29,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import rx.Observable;
+import rx.functions.Action1;
+
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
  * <p>
@@ -239,6 +242,45 @@ public class TasksRepository implements TasksDataSource {
                 });
             }
         });
+    }
+
+    /**
+     * Gets tasks from local data source (sqlite) unless the table is new or empty. In that case it
+     * uses the network data source. This is done to simplify the sample.
+     */
+    @Override
+    public Observable<Task> getTask(@NonNull final String taskId) {
+        checkNotNull(taskId);
+
+        final Task cachedTask = getTaskWithId(taskId);
+
+        // Respond immediately with cache if available
+        if (cachedTask != null) {
+            return Observable.just(cachedTask);
+        }
+
+        // Load from server/persisted if needed.
+
+        // Is the task in the local data source? If not, query the network.
+        Observable<Task> localTask = mTasksLocalDataSource
+                .getTask(taskId)
+                .doOnNext(new Action1<Task>() {
+                    @Override
+                    public void call(Task task) {
+                        mCachedTasks.put(taskId, task);
+                    }
+                });
+        Observable<Task> remoteTask = mTasksRemoteDataSource
+                .getTask(taskId)
+                .doOnNext(new Action1<Task>() {
+                    @Override
+                    public void call(Task task) {
+                        mTasksLocalDataSource.saveTask(task);
+                        mCachedTasks.put(task.getId(), task);
+                    }
+                });
+
+        return Observable.concat(localTask, remoteTask).first();
     }
 
     @Override

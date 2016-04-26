@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase
 
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
 import com.example.android.architecture.blueprints.todoapp.base.domain.error.DataNotAvailableError;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -34,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Fetches the list of tasks.
  */
-public class GetTasks extends UseCase<GetTasks.RequestValues, GetTasks.ResponseValue> {
+public class GetTasks extends UseCaseOld<GetTasks.RequestValues, GetTasks.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
@@ -70,7 +70,7 @@ public class GetTasks extends UseCase<GetTasks.RequestValues, GetTasks.ResponseV
 
     }
 
-    public static final class RequestValues implements UseCase.RequestValues {
+    public static final class RequestValues implements UseCaseOld.RequestValues {
 
         private final TasksFilterType mCurrentFiltering;
         private final boolean mForceUpdate;
@@ -89,7 +89,7 @@ public class GetTasks extends UseCase<GetTasks.RequestValues, GetTasks.ResponseV
         }
     }
 
-    public static final class ResponseValue implements UseCase.ResponseValue {
+    public static final class ResponseValue implements UseCaseOld.ResponseValue {
 
         private final List<Task> mTasks;
 

@@ -21,11 +21,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+
+import rx.Observer;
 
 /**
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and
@@ -77,7 +79,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
             mAddTaskView.showEmptyTaskError();
         } else {
             mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
-                    new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
+                    new UseCaseOld.UseCaseCallback<SaveTask.ResponseValue>() {
                         @Override
                         public void onSuccess(SaveTask.ResponseValue response) {
                             mAddTaskView.showTasksList();
@@ -98,7 +100,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
         }
         Task newTask = new Task(title, description, mTaskId);
         mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
-                new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
+                new UseCaseOld.UseCaseCallback<SaveTask.ResponseValue>() {
                     @Override
                     public void onSuccess(SaveTask.ResponseValue response) {
                         // After an edit, go back to the list.
@@ -118,18 +120,22 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
 
-        mUseCaseHandler.execute(mGetTask, new GetTask.RequestValues(mTaskId),
-                new UseCase.UseCaseCallback<GetTask.ResponseValue>() {
-                    @Override
-                    public void onSuccess(GetTask.ResponseValue response) {
-                        showTask(response.getTask());
-                    }
+        mGetTask.run(new GetTask.RequestValues(mTaskId)).subscribe(new Observer<GetTask.ResponseValue>() {
+            @Override
+            public void onCompleted() {
 
-                    @Override
-                    public void onError(Error error) {
-                        showEmptyTaskError();
-                    }
-                });
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                showEmptyTaskError();
+            }
+
+            @Override
+            public void onNext(GetTask.ResponseValue response) {
+                showTask(response.getTask());
+            }
+        });
     }
 
     private void showTask(Task task) {

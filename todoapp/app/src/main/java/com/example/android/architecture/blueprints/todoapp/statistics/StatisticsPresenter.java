@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
@@ -58,7 +58,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         mStatisticsView.setProgressIndicator(true);
 
         mUseCaseHandler.execute(mGetTasks, new GetTasks.RequestValues(false,
-                TasksFilterType.ALL_TASKS), new UseCase.UseCaseCallback<GetTasks.ResponseValue>() {
+                TasksFilterType.ALL_TASKS), new UseCaseOld.UseCaseCallback<GetTasks.ResponseValue>() {
             @Override
             public void onSuccess(GetTasks.ResponseValue response) {
                 int activeTasks = 0;

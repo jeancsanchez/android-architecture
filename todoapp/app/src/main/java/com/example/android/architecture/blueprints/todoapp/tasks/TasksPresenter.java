@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -102,7 +102,7 @@ public class TasksPresenter implements TasksContract.Presenter {
                 mCurrentFiltering);
 
         mUseCaseHandler.execute(mGetTasks, requestValue,
-                new UseCase.UseCaseCallback<GetTasks.ResponseValue>() {
+                new UseCaseOld.UseCaseCallback<GetTasks.ResponseValue>() {
                     @Override
                     public void onSuccess(GetTasks.ResponseValue response) {
                         List<Task> tasks = response.getTasks();
@@ -184,7 +184,7 @@ public class TasksPresenter implements TasksContract.Presenter {
         checkNotNull(completedTask, "completedTask cannot be null!");
         mUseCaseHandler.execute(mCompleteTask, new CompleteTask.RequestValues(
                         completedTask.getId()),
-                new UseCase.UseCaseCallback<CompleteTask.ResponseValue>() {
+                new UseCaseOld.UseCaseCallback<CompleteTask.ResponseValue>() {
                     @Override
                     public void onSuccess(CompleteTask.ResponseValue response) {
                         mTasksView.showTaskMarkedComplete();
@@ -202,7 +202,7 @@ public class TasksPresenter implements TasksContract.Presenter {
     public void activateTask(@NonNull Task activeTask) {
         checkNotNull(activeTask, "activeTask cannot be null!");
         mUseCaseHandler.execute(mActivateTask, new ActivateTask.RequestValues(activeTask.getId()),
-                new UseCase.UseCaseCallback<ActivateTask.ResponseValue>() {
+                new UseCaseOld.UseCaseCallback<ActivateTask.ResponseValue>() {
                     @Override
                     public void onSuccess(ActivateTask.ResponseValue response) {
                         mTasksView.showTaskMarkedActive();
@@ -219,7 +219,7 @@ public class TasksPresenter implements TasksContract.Presenter {
     @Override
     public void clearCompletedTasks() {
         mUseCaseHandler.execute(mClearCompleteTasks, new ClearCompleteTasks.RequestValues(),
-                new UseCase.UseCaseCallback<ClearCompleteTasks.ResponseValue>() {
+                new UseCaseOld.UseCaseCallback<ClearCompleteTasks.ResponseValue>() {
                     @Override
                     public void onSuccess(ClearCompleteTasks.ResponseValue response) {
                         mTasksView.showCompletedTasksCleared();

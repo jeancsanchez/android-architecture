@@ -52,8 +52,8 @@ public class UseCaseThreadPoolScheduler implements UseCaseScheduler {
     }
 
     @Override
-    public <V extends UseCase.ResponseValue> void notifyResponse(final V response,
-            final UseCase.UseCaseCallback<V> useCaseCallback) {
+    public <V extends UseCaseOld.ResponseValue> void notifyResponse(final V response,
+                                                                    final UseCaseOld.UseCaseCallback<V> useCaseCallback) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -63,8 +63,8 @@ public class UseCaseThreadPoolScheduler implements UseCaseScheduler {
     }
 
     @Override
-    public <V extends UseCase.ResponseValue> void onError(final Error error,
-            final UseCase.UseCaseCallback<V> useCaseCallback) {
+    public <V extends UseCaseOld.ResponseValue> void onError(final Error error,
+                                                             final UseCaseOld.UseCaseCallback<V> useCaseCallback) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {

@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask.domain.u
 
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.UseCaseOld;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Updates or creates a new {@link Task} in the {@link TasksRepository}.
  */
-public class SaveTask extends UseCase<SaveTask.RequestValues, SaveTask.ResponseValue> {
+public class SaveTask extends UseCaseOld<SaveTask.RequestValues, SaveTask.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
@@ -43,7 +43,7 @@ public class SaveTask extends UseCase<SaveTask.RequestValues, SaveTask.ResponseV
         getUseCaseCallback().onSuccess(new ResponseValue(task));
     }
 
-    public static final class RequestValues implements UseCase.RequestValues {
+    public static final class RequestValues implements UseCaseOld.RequestValues {
 
         private final Task mTask;
 
@@ -56,7 +56,7 @@ public class SaveTask extends UseCase<SaveTask.RequestValues, SaveTask.ResponseV
         }
     }
 
-    public static final class ResponseValue implements UseCase.ResponseValue {
+    public static final class ResponseValue implements UseCaseOld.ResponseValue {
 
         private final Task mTask;
 

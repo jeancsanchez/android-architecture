@@ -22,6 +22,8 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 
 import java.util.List;
 
+import rx.Observable;
+
 /**
  * Main entry point for accessing tasks data.
  * <p>
@@ -61,6 +63,8 @@ public interface TasksDataSource {
     void activateTask(@NonNull String taskId);
 
     void clearCompletedTasks();
+
+    Observable<Task> getTask(@NonNull String taskId);
 
     void refreshTasks();
 

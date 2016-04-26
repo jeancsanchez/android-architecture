@@ -21,13 +21,20 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
+import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite.SqlBrite;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.Observable;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -37,6 +44,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class TasksLocalDataSource implements TasksDataSource {
 
     private static TasksLocalDataSource INSTANCE;
+    private final BriteDatabase mDatabaseHelper;
+    private Func1<Cursor, Task> mTaskMapperFunction;
 
     private TasksDbHelper mDbHelper;
 
@@ -44,6 +53,20 @@ public class TasksLocalDataSource implements TasksDataSource {
     private TasksLocalDataSource(@NonNull Context context) {
         checkNotNull(context);
         mDbHelper = new TasksDbHelper(context);
+        SqlBrite sqlBrite = SqlBrite.create();
+        mDatabaseHelper = sqlBrite.wrapDatabaseHelper(mDbHelper, Schedulers.io());
+        mTaskMapperFunction = new Func1<Cursor, Task>() {
+            @Override
+            public Task call(Cursor c) {
+                String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
+                String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
+                String description =
+                        c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
+                boolean completed =
+                        c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
+                return new Task(title, description, itemId, completed);
+            }
+        };
     }
 
     public static TasksLocalDataSource getInstance(@NonNull Context context) {
@@ -143,6 +166,20 @@ public class TasksLocalDataSource implements TasksDataSource {
         } else {
             callback.onDataNotAvailable();
         }
+    }
+
+    @Override
+    public Observable<Task> getTask(@NonNull String taskId) {
+        String[] projection = {
+                TaskEntry.COLUMN_NAME_ENTRY_ID,
+                TaskEntry.COLUMN_NAME_TITLE,
+                TaskEntry.COLUMN_NAME_DESCRIPTION,
+                TaskEntry.COLUMN_NAME_COMPLETED
+        };
+        String sql = String.format("SELECT %s FROM %s WHERE %s LIKE ?",
+                TextUtils.join(",", projection), TaskEntry.TABLE_NAME, TaskEntry.COLUMN_NAME_ENTRY_ID);
+        return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql, taskId)
+                .mapToOneOrDefault(mTaskMapperFunction, null);
     }
 
     @Override

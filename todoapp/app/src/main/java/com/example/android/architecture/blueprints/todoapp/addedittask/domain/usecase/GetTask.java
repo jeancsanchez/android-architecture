@@ -19,10 +19,13 @@ package com.example.android.architecture.blueprints.todoapp.addedittask.domain.u
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
-import com.example.android.architecture.blueprints.todoapp.base.domain.error.DataNotAvailableError;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import rx.Observable;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,24 +34,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class GetTask extends UseCase<GetTask.RequestValues, GetTask.ResponseValue> {
 
-    private final TasksRepository mTasksRepository;
+    private final TasksDataSource mTasksRepository;
 
-    public GetTask(@NonNull TasksRepository tasksRepository) {
+    public GetTask(@NonNull TasksDataSource tasksRepository) {
+        super(Schedulers.io());
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
     }
 
     @Override
-    protected void executeUseCase(final RequestValues values) {
-        mTasksRepository.getTask(values.getTaskId(), new TasksDataSource.GetTaskCallback() {
+    protected Observable<ResponseValue> executeUseCase(final RequestValues values) {
+        return mTasksRepository.getTask(values.getTaskId()).map(new Func1<Task, GetTask.ResponseValue>() {
             @Override
-            public void onTaskLoaded(Task task) {
-                ResponseValue responseValue = new ResponseValue(task);
-                getUseCaseCallback().onSuccess(responseValue);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                getUseCaseCallback().onError(new DataNotAvailableError());
+            public ResponseValue call(Task task) {
+                return new ResponseValue(task);
             }
         });
     }
