@@ -73,6 +73,7 @@ public class GetTask extends UseCase<GetTask.RequestValues, GetTask.ResponseValu
             mTask = checkNotNull(task, "task cannot be null!");
         }
 
+        @NonNull
         public Task getTask() {
             return mTask;
         }
