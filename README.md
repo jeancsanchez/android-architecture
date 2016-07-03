@@ -49,8 +49,8 @@ Presenter contains business logic. View converts the presenter's commands to
 UI actions and listens to user actions, which are passed to the presenter. 
 Navigator responsible for navigating to another screen.
 
-Contracts are interfaces used to define the connection between views and
-presenters.
+Contracts are interfaces used to define the connection between presenters,
+views and navigators.
 
 ### Dependencies
 
@@ -69,7 +69,8 @@ None
 
 #### Conceptual complexity 
 
-Low, as it's a pure MVP implementation for Android
+Low, concept of Navigator is very simple so it adds nothing to the
+complexity of MVP implementation.
 
 ### Testability
 
