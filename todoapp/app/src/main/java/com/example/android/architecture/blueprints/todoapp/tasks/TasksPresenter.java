@@ -39,14 +39,18 @@ public class TasksPresenter implements TasksContract.Presenter {
     private final TasksRepository mTasksRepository;
 
     private final TasksContract.View mTasksView;
+    private final TasksContract.Navigator mTasksNavigator;
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private boolean mFirstLoad = true;
 
-    public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+    public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView,
+                          @NonNull TasksContract.Navigator tasksNavigator) {
+
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
+        mTasksNavigator = checkNotNull(tasksNavigator, "tasksNavigator cannot be null!");
 
         mTasksView.setPresenter(this);
     }
@@ -184,13 +188,13 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     @Override
     public void addNewTask() {
-        mTasksView.showAddTask();
+        mTasksNavigator.showAddTask();
     }
 
     @Override
     public void openTaskDetails(@NonNull Task requestedTask) {
         checkNotNull(requestedTask, "requestedTask cannot be null!");
-        mTasksView.showTaskDetailsUi(requestedTask.getId());
+        mTasksNavigator.showTaskDetailsUi(requestedTask.getId());
     }
 
     @Override

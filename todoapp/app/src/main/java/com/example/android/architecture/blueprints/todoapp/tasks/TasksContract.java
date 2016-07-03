@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.BaseNavigator;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.BasePresenter;
@@ -34,10 +35,6 @@ public interface TasksContract {
         void setLoadingIndicator(boolean active);
 
         void showTasks(List<Task> tasks);
-
-        void showAddTask();
-
-        void showTaskDetailsUi(String taskId);
 
         void showTaskMarkedComplete();
 
@@ -85,5 +82,11 @@ public interface TasksContract {
         void setFiltering(TasksFilterType requestType);
 
         TasksFilterType getFiltering();
+    }
+
+    interface Navigator extends BaseNavigator {
+        void showAddTask();
+
+        void showTaskDetailsUi(String taskId);
     }
 }

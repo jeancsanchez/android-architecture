@@ -48,6 +48,9 @@ public class TasksPresenterTest {
     @Mock
     private TasksContract.View mTasksView;
 
+    @Mock
+    private TasksContract.Navigator mTasksNavigator;
+
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
@@ -64,7 +67,7 @@ public class TasksPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView);
+        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView, mTasksNavigator);
 
         // The presenter won't update the view unless it's active.
         when(mTasksView.isActive()).thenReturn(true);
@@ -136,7 +139,7 @@ public class TasksPresenterTest {
         mTasksPresenter.addNewTask();
 
         // Then add task UI is shown
-        verify(mTasksView).showAddTask();
+        verify(mTasksNavigator).showAddTask();
     }
 
     @Test
@@ -148,7 +151,7 @@ public class TasksPresenterTest {
         mTasksPresenter.openTaskDetails(requestedTask);
 
         // Then task detail UI is shown
-        verify(mTasksView).showTaskDetailsUi(any(String.class));
+        verify(mTasksNavigator).showTaskDetailsUi(any(String.class));
     }
 
     @Test

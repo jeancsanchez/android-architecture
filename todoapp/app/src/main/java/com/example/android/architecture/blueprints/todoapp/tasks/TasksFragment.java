@@ -120,7 +120,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mNoTaskAddView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAddTask();
+                mPresenter.addNewTask();
             }
         });
 
@@ -306,21 +306,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void showAllFilterLabel() {
         mFilteringLabelView.setText(getResources().getString(R.string.label_all));
-    }
-
-    @Override
-    public void showAddTask() {
-        Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
-    }
-
-    @Override
-    public void showTaskDetailsUi(String taskId) {
-        // in it's own Activity, since it makes more sense that way and it gives us the flexibility
-        // to show some Intent stubbing.
-        Intent intent = new Intent(getContext(), TaskDetailActivity.class);
-        intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, taskId);
-        startActivity(intent);
     }
 
     @Override
