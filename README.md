@@ -1,13 +1,16 @@
-# TODO-MVP
+# TODO-MVP-NAVIGATOR
+
+Project contributors: [Nikita Kozlov](https://github.com/NikitaKozlov)
 
 ### Summary
 
 This sample is the base for many of the variants. It showcases a simple
-implementation of the Model-View-Presenter pattern with no architectural
-frameworks. It uses manual dependency injection to provide a repository with
+implementation of the Model-View-Presenter pattern with Navigator. 
+It uses manual dependency injection to provide a repository with
 local and remote data sources. Asynchronous tasks are handled with callbacks.
 
-<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp.png" alt="Diagram"/>
+In comparison to the **TODO-MVP** example, all "navigation" methods are 
+removed from the view to reach better separation of concerns. 
 
 Note: in a MVP context, the term "view" is overloaded:
 
@@ -21,7 +24,7 @@ It uses fragments for two reasons:
 
   * The separation between Activity and Fragment fits nicely with this
 implementation of MVP: the Activity is the overall controller that creates and
-connects views and presenters.
+connects presenters with views and navigators.
   * Tablet layout or screens with multiple views take advantage of the Fragments
 framework.
 
@@ -41,11 +44,10 @@ Each feature has:
   * A Fragment which implements the view interface. 
   * A presenter which implements the presenter interface
 
-In general, the business logic lives in the presenter and relies on the view to
-do the Android UI work. 
 
-The view contains almost no logic: it converts the presenter's commands to UI
-actions and listens to user actions, which are passed to the presenter. 
+Presenter contains business logic. View converts the presenter's commands to 
+UI actions and listens to user actions, which are passed to the presenter. 
+Navigator responsible for navigating to another screen.
 
 Contracts are interfaces used to define the connection between views and
 presenters.
@@ -79,23 +81,6 @@ High, presenters are unit tested as well as repositories and data sources.
 
 High, injection of fake modules allow for testing with fake data
 
-### Code metrics
-
-Compared to a traditional project with no architecture in place, this sample
-introduces additional classes and interfaces: presenters, a repository,
-contracts, etc. So lines of code and number of classes are higher in MVP.
-
-
-```
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-Java                            46           1075           1451           3451
-XML                             34             97            337            601
--------------------------------------------------------------------------------
-SUM:                            80           1172           1788           4052
--------------------------------------------------------------------------------
-```
 ### Maintainability
 
 #### Ease of amending or adding a feature
