@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import com.example.android.architecture.blueprints.todoapp.BaseNavigator;
 import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 
@@ -40,8 +41,6 @@ public interface TaskDetailContract {
 
         void showCompletionStatus(boolean complete);
 
-        void showEditTask(String taskId);
-
         void showTaskDeleted();
 
         void showTaskMarkedComplete();
@@ -60,5 +59,9 @@ public interface TaskDetailContract {
         void completeTask();
 
         void activateTask();
+    }
+
+    interface Navigator extends BaseNavigator {
+        void showEditTask(String taskId);
     }
 }

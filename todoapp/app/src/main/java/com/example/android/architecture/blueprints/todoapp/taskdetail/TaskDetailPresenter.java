@@ -34,16 +34,19 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     private final TasksRepository mTasksRepository;
 
     private final TaskDetailContract.View mTaskDetailView;
+    private final TaskDetailContract.Navigator mTaskDetailNavigator;
 
     @Nullable
     private String mTaskId;
 
     public TaskDetailPresenter(@Nullable String taskId,
                                @NonNull TasksRepository tasksRepository,
-                               @NonNull TaskDetailContract.View taskDetailView) {
+                               @NonNull TaskDetailContract.View taskDetailView,
+                               @NonNull TaskDetailContract.Navigator taskDetailNavigator) {
         this.mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
+        mTaskDetailNavigator = checkNotNull(taskDetailNavigator, "taskDetailNavigator cannot be null!");
 
         mTaskDetailView.setPresenter(this);
     }
@@ -92,7 +95,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTaskDetailView.showEditTask(mTaskId);
+        mTaskDetailNavigator.showEditTask(mTaskId);
     }
 
     @Override
