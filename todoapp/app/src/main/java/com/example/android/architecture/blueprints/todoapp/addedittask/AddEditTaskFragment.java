@@ -98,12 +98,6 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     }
 
     @Override
-    public void showTasksList() {
-        getActivity().setResult(Activity.RESULT_OK);
-        getActivity().finish();
-    }
-
-    @Override
     public void setTitle(String title) {
         mTitle.setText(title);
     }

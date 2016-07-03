@@ -73,7 +73,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         new AddEditTaskPresenter(
                 taskId,
                 Injection.provideTasksRepository(getApplicationContext()),
-                addEditTaskFragment);
+                addEditTaskFragment, new AddEditTaskNavigator(this));
     }
 
     @Override

@@ -37,21 +37,26 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @NonNull
     private final AddEditTaskContract.View mAddTaskView;
 
+    @NonNull
+    private final AddEditTaskContract.Navigator mAddEditTaskNavigator;
+
     @Nullable
     private String mTaskId;
 
     /**
      * Creates a presenter for the add/edit view.
-     *
-     * @param taskId ID of the task to edit or null for a new task
+     *  @param taskId ID of the task to edit or null for a new task
      * @param tasksRepository a repository of data for tasks
      * @param addTaskView the add/edit view
+     * @param addEditTaskNavigator the add/edit navigator
      */
     public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView) {
+                                @NonNull AddEditTaskContract.View addTaskView,
+                                @NonNull AddEditTaskContract.Navigator addEditTaskNavigator) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
+        mAddEditTaskNavigator = checkNotNull(addEditTaskNavigator);
 
         mAddTaskView.setPresenter(this);
     }
@@ -107,7 +112,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
             mAddTaskView.showEmptyTaskError();
         } else {
             mTasksRepository.saveTask(newTask);
-            mAddTaskView.showTasksList();
+            mAddEditTaskNavigator.showTasksList();
         }
     }
 
@@ -116,6 +121,6 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
             throw new RuntimeException("updateTask() was called but task is new.");
         }
         mTasksRepository.saveTask(new Task(title, description, mTaskId));
-        mAddTaskView.showTasksList(); // After an edit, go back to the list.
+        mAddEditTaskNavigator.showTasksList(); // After an edit, go back to the list.
     }
 }

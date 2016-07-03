@@ -43,6 +43,9 @@ public class AddEditTaskPresenterTest {
     @Mock
     private AddEditTaskContract.View mAddEditTaskView;
 
+    @Mock
+    private AddEditTaskContract.Navigator mAddEditTaskNavigator;
+
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
@@ -65,20 +68,20 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView, mAddEditTaskNavigator);
 
         // When the presenter is asked to save a task
         mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
 
         // Then a task is saved in the repository and the view updated
         verify(mTasksRepository).saveTask(any(Task.class)); // saved to the model
-        verify(mAddEditTaskView).showTasksList(); // shown in the UI
+        verify(mAddEditTaskNavigator).showTasksList(); // shown in the UI
     }
 
     @Test
     public void saveTask_emptyTaskShowsErrorUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView, mAddEditTaskNavigator);
 
         // When the presenter is asked to save an empty task
         mAddEditTaskPresenter.saveTask("", "");
@@ -90,14 +93,14 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveExistingTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView, mAddEditTaskNavigator);
 
         // When the presenter is asked to save an existing task
         mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
 
         // Then a task is saved in the repository and the view updated
         verify(mTasksRepository).saveTask(any(Task.class)); // saved to the model
-        verify(mAddEditTaskView).showTasksList(); // shown in the UI
+        verify(mAddEditTaskNavigator).showTasksList(); // shown in the UI
     }
 
     @Test
@@ -105,7 +108,7 @@ public class AddEditTaskPresenterTest {
         Task testTask = new Task("TITLE", "DESCRIPTION");
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),
-                mTasksRepository, mAddEditTaskView);
+                mTasksRepository, mAddEditTaskView, mAddEditTaskNavigator);
 
         // When the presenter is asked to populate an existing task
         mAddEditTaskPresenter.populateTask();
