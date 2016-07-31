@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import com.example.android.architecture.blueprints.todoapp.BaseNavigator;
 import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 
@@ -61,7 +60,7 @@ public interface TaskDetailContract {
         void activateTask();
     }
 
-    interface Navigator extends BaseNavigator {
+    interface Navigator {
         void showEditTask(String taskId);
     }
 }

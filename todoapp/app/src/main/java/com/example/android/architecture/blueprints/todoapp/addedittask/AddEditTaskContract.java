@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import com.example.android.architecture.blueprints.todoapp.BaseNavigator;
 import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 
@@ -43,7 +42,7 @@ public interface AddEditTaskContract {
         void populateTask();
     }
 
-    interface Navigator extends BaseNavigator {
+    interface Navigator {
         void showTasksList();
     }
 }

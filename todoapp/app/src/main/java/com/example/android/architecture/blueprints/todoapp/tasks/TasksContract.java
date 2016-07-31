@@ -18,7 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.BaseNavigator;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.BasePresenter;
@@ -84,7 +83,7 @@ public interface TasksContract {
         TasksFilterType getFiltering();
     }
 
-    interface Navigator extends BaseNavigator {
+    interface Navigator {
         void showAddTask();
 
         void showTaskDetailsUi(String taskId);
