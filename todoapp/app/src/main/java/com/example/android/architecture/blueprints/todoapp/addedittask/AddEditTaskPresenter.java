@@ -38,7 +38,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     private final AddEditTaskContract.View mAddTaskView;
 
     @NonNull
-    private final AddEditTaskContract.Navigator mAddEditTaskNavigator;
+    private final AddEditTaskNavigator mAddEditTaskNavigator;
 
     @Nullable
     private String mTaskId;
@@ -52,7 +52,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
      */
     public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
                                 @NonNull AddEditTaskContract.View addTaskView,
-                                @NonNull AddEditTaskContract.Navigator addEditTaskNavigator) {
+                                @NonNull AddEditTaskNavigator addEditTaskNavigator) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);

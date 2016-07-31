@@ -34,7 +34,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     private final TasksRepository mTasksRepository;
 
     private final TaskDetailContract.View mTaskDetailView;
-    private final TaskDetailContract.Navigator mTaskDetailNavigator;
+    private final TaskDetailNavigator mTaskDetailNavigator;
 
     @Nullable
     private String mTaskId;
@@ -42,7 +42,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     public TaskDetailPresenter(@Nullable String taskId,
                                @NonNull TasksRepository tasksRepository,
                                @NonNull TaskDetailContract.View taskDetailView,
-                               @NonNull TaskDetailContract.Navigator taskDetailNavigator) {
+                               @NonNull TaskDetailNavigator taskDetailNavigator) {
         this.mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");

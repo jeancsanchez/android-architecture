@@ -82,10 +82,4 @@ public interface TasksContract {
 
         TasksFilterType getFiltering();
     }
-
-    interface Navigator {
-        void showAddTask();
-
-        void showTaskDetailsUi(String taskId);
-    }
 }

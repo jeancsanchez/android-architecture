@@ -41,8 +41,4 @@ public interface AddEditTaskContract {
 
         void populateTask();
     }
-
-    interface Navigator {
-        void showTasksList();
-    }
 }

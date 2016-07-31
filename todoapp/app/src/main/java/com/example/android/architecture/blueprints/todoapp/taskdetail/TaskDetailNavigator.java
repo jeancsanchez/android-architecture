@@ -7,7 +7,7 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 
 import static com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragment.REQUEST_EDIT_TASK;
 
-public class TaskDetailNavigator implements TaskDetailContract.Navigator {
+public class TaskDetailNavigator {
 
     private final TaskDetailFragment mTaskDetailFragment;
 
@@ -15,7 +15,6 @@ public class TaskDetailNavigator implements TaskDetailContract.Navigator {
         this.mTaskDetailFragment = mTaskDetailFragment;
     }
 
-    @Override
     public void showEditTask(String taskId) {
         Intent intent = new Intent(mTaskDetailFragment.getContext(), AddEditTaskActivity.class);
         intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);

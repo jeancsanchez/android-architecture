@@ -39,14 +39,14 @@ public class TasksPresenter implements TasksContract.Presenter {
     private final TasksRepository mTasksRepository;
 
     private final TasksContract.View mTasksView;
-    private final TasksContract.Navigator mTasksNavigator;
+    private final TasksNavigator mTasksNavigator;
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private boolean mFirstLoad = true;
 
     public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView,
-                          @NonNull TasksContract.Navigator tasksNavigator) {
+                          @NonNull TasksNavigator tasksNavigator) {
 
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");

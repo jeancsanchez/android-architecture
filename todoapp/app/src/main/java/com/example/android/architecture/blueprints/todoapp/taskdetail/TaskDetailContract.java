@@ -59,8 +59,4 @@ public interface TaskDetailContract {
 
         void activateTask();
     }
-
-    interface Navigator {
-        void showEditTask(String taskId);
-    }
 }
