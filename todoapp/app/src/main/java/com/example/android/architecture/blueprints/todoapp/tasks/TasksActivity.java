@@ -74,7 +74,7 @@ public class TasksActivity extends AppCompatActivity {
         // Create the presenter
         mTasksPresenter = new TasksPresenter(
                 Injection.provideTasksRepository(getApplicationContext()), tasksFragment,
-                new TasksNavigator(tasksFragment));
+                new TasksNavigator(this));
 
 
         // Load previously saved state, if available.
