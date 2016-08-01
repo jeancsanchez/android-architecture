@@ -65,7 +65,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         new TaskDetailPresenter(
                 taskId,
                 Injection.provideTasksRepository(getApplicationContext()),
-                taskDetailFragment, new TaskDetailNavigator(this));
+                taskDetailFragment, new TaskDetailNavigator(taskDetailFragment));
     }
 
     @Override
