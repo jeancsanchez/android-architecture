@@ -16,9 +16,15 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -28,6 +34,7 @@ import com.example.android.architecture.blueprints.todoapp.statistics.Statistics
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,12 +45,15 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import static android.content.Intent.ACTION_BATTERY_CHANGED;
+
 
 public class TasksActivity extends AppCompatActivity implements TaskItemNavigator, TasksNavigator {
 
     private DrawerLayout mDrawerLayout;
 
     private TasksViewModel mViewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

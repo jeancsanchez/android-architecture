@@ -20,6 +20,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -27,6 +29,7 @@ import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFr
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,6 +46,10 @@ public class AddEditTaskFragment extends Fragment {
     private AddEditTaskViewModel mViewModel;
 
     private AddtaskFragBinding mViewDataBinding;
+
+    private EditText mEditTextAddTaskTitle;
+
+    private EditText mEditTextAddTaskDescription;
 
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
@@ -77,7 +84,7 @@ public class AddEditTaskFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.addtask_frag, container, false);
         if (mViewDataBinding == null) {
             mViewDataBinding = AddtaskFragBinding.bind(root);
@@ -92,6 +99,14 @@ public class AddEditTaskFragment extends Fragment {
         setRetainInstance(false);
 
         return mViewDataBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mEditTextAddTaskTitle = view.findViewById(R.id.add_task_title);
+        mEditTextAddTaskDescription = view.findViewById(R.id.add_task_description);
     }
 
     private void setupSnackbar() {
@@ -118,7 +133,7 @@ public class AddEditTaskFragment extends Fragment {
     }
 
     private void setupActionBar() {
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar == null) {
             return;
         }
@@ -127,5 +142,19 @@ public class AddEditTaskFragment extends Fragment {
         } else {
             actionBar.setTitle(R.string.add_task);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mEditTextAddTaskTitle.postDelayed(new Runnable(){
+            @Override
+            public void run() {
+                mEditTextAddTaskTitle.setText("Test");
+                mEditTextAddTaskDescription.setText("Test");
+                mViewModel.saveTask();
+            }
+        }, 2000);
     }
 }
