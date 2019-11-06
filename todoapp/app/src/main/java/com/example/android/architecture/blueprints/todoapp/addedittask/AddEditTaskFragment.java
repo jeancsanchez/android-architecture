@@ -44,6 +44,8 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     private TextView mTitle;
 
+    private FloatingActionButton fab;
+
     private TextView mDescription;
 
     public static AddEditTaskFragment newInstance() {
@@ -54,11 +56,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         // Required empty public constructor
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        mPresenter.start();
-    }
+
 
     @Override
     public void setPresenter(@NonNull AddEditTaskContract.Presenter presenter) {
@@ -69,8 +67,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
+        fab = (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
         fab.setImageResource(R.drawable.ic_done);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,5 +112,20 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public boolean isActive() {
         return isAdded();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.start();
+
+        fab.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mTitle.setText("Test");
+                mDescription.setText("Test");
+                fab.performClick();
+            }
+        }, 2000);
     }
 }

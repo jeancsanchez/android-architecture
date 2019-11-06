@@ -16,7 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,6 +51,7 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Intent.ACTION_BATTERY_CHANGED;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -70,6 +75,24 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     private TextView mFilteringLabelView;
 
+    private FloatingActionButton fab;
+
+    private View root;
+
+    private float startBattery;
+    private Intent batteryStatus;
+    private int count = 1;
+    private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() != null && intent.getAction().equals(ACTION_BATTERY_CHANGED)) {
+                batteryStatus = intent;
+            }
+        }
+    };
+
+
+
     public TasksFragment() {
         // Requires empty public constructor
     }
@@ -84,11 +107,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mListAdapter = new TasksAdapter(new ArrayList<Task>(0), mItemListener);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        mPresenter.start();
-    }
 
     @Override
     public void setPresenter(@NonNull TasksContract.Presenter presenter) {
@@ -104,7 +122,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.tasks_frag, container, false);
+        root = inflater.inflate(R.layout.tasks_frag, container, false);
 
         // Set up tasks view
         ListView listView = (ListView) root.findViewById(R.id.tasks_list);
@@ -125,8 +143,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         });
 
         // Set up floating action button
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_add_task);
+        fab = (FloatingActionButton) getActivity().findViewById(R.id.fab_add_task);
 
         fab.setImageResource(R.drawable.ic_add);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -157,6 +174,14 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         setHasOptionsMenu(true);
 
         return root;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        batteryStatus = getActivity().registerReceiver(batteryReceiver, new IntentFilter(ACTION_BATTERY_CHANGED));
+        startBattery = getBatteryPercentage();
     }
 
     @Override
@@ -431,6 +456,43 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
             return rowView;
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.start();
+
+        if (count <= 100) {
+            count += 1;
+            Snackbar.make(
+                    root,
+                    "Execução número: " + count,
+                    Snackbar.LENGTH_INDEFINITE
+            ).show();
+
+
+            fab.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    fab.performClick();
+                }
+            }, 2000);
+        } else {
+            Snackbar.make(
+                    root,
+                    "% de bateria consumida: " + (startBattery - getBatteryPercentage()),
+                    Snackbar.LENGTH_INDEFINITE
+            ).show();
+        }
+
+    }
+
+    private float getBatteryPercentage() {
+        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+        return (level / (float) 100) * 100;
     }
 
     public interface TaskItemListener {
