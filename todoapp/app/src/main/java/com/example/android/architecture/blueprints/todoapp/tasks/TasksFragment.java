@@ -30,6 +30,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+
 import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout;
@@ -40,12 +46,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 
 import static android.content.Intent.ACTION_BATTERY_CHANGED;
 
@@ -71,6 +71,8 @@ public class TasksFragment extends Fragment {
 
     private TasksAdapter mListAdapter;
     private FloatingActionButton fab;
+    private float startBattery;
+    private int count = 1;
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -130,7 +132,8 @@ public class TasksFragment extends Fragment {
 
         setupRefreshLayout();
 
-        batteryStatus = getActivity().registerReceiver(null, new IntentFilter(ACTION_BATTERY_CHANGED));
+        batteryStatus = getActivity().registerReceiver(batteryReceiver, new IntentFilter(ACTION_BATTERY_CHANGED));
+        startBattery = getBatteryPercentage();
     }
 
     private void setupSnackbar() {
@@ -210,21 +213,33 @@ public class TasksFragment extends Fragment {
         super.onResume();
         mTasksViewModel.start();
 
+        if (count <= 100) {
+            count += 1;
+            Snackbar.make(
+                    mTasksFragBinding.getRoot(),
+                    "Execução número: " + count,
+                    Snackbar.LENGTH_INDEFINITE
+            ).show();
+
+            fab.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    fab.performClick();
+                }
+            }, 2000);
+        } else {
+            Snackbar.make(
+                    mTasksFragBinding.getRoot(),
+                    "% de bateria consumida: " + (startBattery - getBatteryPercentage()),
+                    Snackbar.LENGTH_INDEFINITE
+            ).show();
+        }
+    }
+
+    private float getBatteryPercentage() {
         int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
-        final float batteryPct = (level / (float) scale) * 100;
-
-        fab.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (batteryPct > 64) {
-                    fab.performClick();
-                } else {
-                    Snackbar.make(mTasksFragBinding.getRoot(), "Teste finalizado", Snackbar.LENGTH_INDEFINITE).show();
-                }
-            }
-        }, 2000);
+        return (level / (float) 100) * 100;
     }
-
 }
