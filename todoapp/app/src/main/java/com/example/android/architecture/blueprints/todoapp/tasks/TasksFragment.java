@@ -22,14 +22,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.widget.PopupMenu;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,6 +53,8 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,7 +97,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             }
         }
     };
-
 
 
     public TasksFragment() {
@@ -463,36 +469,37 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         super.onResume();
         mPresenter.start();
 
-        if (count <= 100) {
+        if (getBatteryPercentage() > 99) {
             count += 1;
-            Snackbar.make(
-                    root,
-                    "Execução número: " + count,
-                    Snackbar.LENGTH_INDEFINITE
-            ).show();
-
+            Snackbar.make(root, "Execução número: " + count, Snackbar.LENGTH_INDEFINITE).show();
 
             fab.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     fab.performClick();
                 }
-            }, 2000);
+            }, 1000);
         } else {
-            Snackbar.make(
-                    root,
-                    "% de bateria consumida: " + (startBattery - getBatteryPercentage()),
-                    Snackbar.LENGTH_INDEFINITE
-            ).show();
+            Snackbar.make(root, "Total de execuções: " + count, Snackbar.LENGTH_INDEFINITE).show();
+            writeToFile("MVP: " + String.valueOf(count), getActivity());
         }
-
     }
 
     private float getBatteryPercentage() {
         int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
-        return (level / (float) 100) * 100;
+        return (level / (float) scale) * 100;
+    }
+
+    private void writeToFile(String data, Context context) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("results.txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
     }
 
     public interface TaskItemListener {
@@ -503,5 +510,4 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
         void onActivateTaskClick(Task activatedTask);
     }
-
 }
