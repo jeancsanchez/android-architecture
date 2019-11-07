@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +46,8 @@ import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import static android.content.Intent.ACTION_BATTERY_CHANGED;
@@ -213,7 +216,7 @@ public class TasksFragment extends Fragment {
         super.onResume();
         mTasksViewModel.start();
 
-        if (count <= 100) {
+        if (getBatteryPercentage() > 99) {
             count += 1;
             Snackbar.make(
                     mTasksFragBinding.getRoot(),
@@ -226,13 +229,10 @@ public class TasksFragment extends Fragment {
                 public void run() {
                     fab.performClick();
                 }
-            }, 2000);
+            }, 1000);
         } else {
-            Snackbar.make(
-                    mTasksFragBinding.getRoot(),
-                    "% de bateria consumida: " + (startBattery - getBatteryPercentage()),
-                    Snackbar.LENGTH_INDEFINITE
-            ).show();
+            Snackbar.make(mTasksFragBinding.getRoot(), "Número de execuções: " + count, Snackbar.LENGTH_INDEFINITE).show();
+            writeToFile("MVVM: " + count, getActivity());
         }
     }
 
@@ -240,6 +240,16 @@ public class TasksFragment extends Fragment {
         int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
-        return (level / (float) 100) * 100;
+        return (level / (float) scale) * 100;
+    }
+
+    private void writeToFile(String data, Context context) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
     }
 }
