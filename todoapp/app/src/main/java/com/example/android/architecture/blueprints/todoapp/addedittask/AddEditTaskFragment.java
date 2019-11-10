@@ -155,6 +155,6 @@ public class AddEditTaskFragment extends Fragment {
                 mEditTextAddTaskDescription.setText("Test");
                 mViewModel.saveTask();
             }
-        }, 2000);
+        }, 1000);
     }
 }
