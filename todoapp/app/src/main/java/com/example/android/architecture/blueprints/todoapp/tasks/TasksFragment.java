@@ -243,7 +243,12 @@ public class TasksFragment extends Fragment {
         return (level / (float) scale) * 100;
     }
 
+
     private void writeToFile(String data, Context context) {
+        /*-  registrar o tempo levado para executar todas
+        -  gráfico excucoes x bateria
+        -  gráfico tempo x bateria
+        -  gráfico execucoes x tempo*/
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
