@@ -72,9 +72,7 @@ public class TasksFragment extends Fragment {
         }
     };
 
-    private TasksAdapter mListAdapter;
     private FloatingActionButton fab;
-    private float startBattery;
     private int count = 1;
 
     public TasksFragment() {
@@ -119,11 +117,6 @@ public class TasksFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.tasks_fragment_menu, menu);
-    }
-
-    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -136,7 +129,6 @@ public class TasksFragment extends Fragment {
         setupRefreshLayout();
 
         batteryStatus = getActivity().registerReceiver(batteryReceiver, new IntentFilter(ACTION_BATTERY_CHANGED));
-        startBattery = getBatteryPercentage();
     }
 
     private void setupSnackbar() {
@@ -191,7 +183,7 @@ public class TasksFragment extends Fragment {
     private void setupListAdapter() {
         ListView listView = mTasksFragBinding.tasksList;
 
-        mListAdapter = new TasksAdapter(
+        TasksAdapter mListAdapter = new TasksAdapter(
                 new ArrayList<Task>(0),
                 mTasksViewModel,
                 getActivity()
@@ -244,7 +236,7 @@ public class TasksFragment extends Fragment {
     }
 
 
-    private void writeToFile(String data, Context context) {
+    private static void writeToFile(String data, Context context) {
         /*-  registrar o tempo levado para executar todas
         -  gráfico excucoes x bateria
         -  gráfico tempo x bateria
