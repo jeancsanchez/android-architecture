@@ -39,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * //TODO: Implement this class using LiveData.
  */
-public class TasksRepository implements TasksDataSource {
+public class TasksRepository implements TasksDataSource, TasksDataSource.TasksActions {
 
     private volatile static TasksRepository INSTANCE = null;
 

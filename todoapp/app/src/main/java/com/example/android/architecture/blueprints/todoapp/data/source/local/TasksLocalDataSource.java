@@ -136,11 +136,6 @@ public class TasksLocalDataSource implements TasksDataSource {
         mAppExecutors.diskIO().execute(completeRunnable);
     }
 
-    @Override
-    public void completeTask(@NonNull String taskId) {
-        // Not required for the local data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
-    }
 
     @Override
     public void activateTask(@NonNull final Task task) {
@@ -153,11 +148,6 @@ public class TasksLocalDataSource implements TasksDataSource {
         mAppExecutors.diskIO().execute(activateRunnable);
     }
 
-    @Override
-    public void activateTask(@NonNull String taskId) {
-        // Not required for the local data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
-    }
 
     @Override
     public void clearCompletedTasks() {
@@ -170,12 +160,6 @@ public class TasksLocalDataSource implements TasksDataSource {
         };
 
         mAppExecutors.diskIO().execute(clearTasksRunnable);
-    }
-
-    @Override
-    public void refreshTasks() {
-        // Not required because the {@link TasksRepository} handles the logic of refreshing the
-        // tasks from all the available data sources.
     }
 
     @Override
