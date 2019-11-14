@@ -16,6 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
 import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -26,14 +32,6 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.arch.core.util.Function;
-import androidx.databinding.BaseObservable;
-import androidx.databinding.Bindable;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
 
 
 /**
@@ -70,16 +68,6 @@ public class TasksViewModel extends ViewModel {
 
     private final MutableLiveData<Event<Object>> mNewTaskEvent = new MutableLiveData<>();
 
-    // This LiveData depends on another so we can use a transformation.
-    public final LiveData<Boolean> empty = Transformations.map(mItems,
-            new Function<List<Task>, Boolean>() {
-                @Override
-                public Boolean apply(List<Task> input) {
-                    return input.isEmpty();
-
-                }
-            });
-
     public TasksViewModel(TasksRepository repository) {
         mTasksRepository = repository;
 
@@ -87,11 +75,11 @@ public class TasksViewModel extends ViewModel {
         setFiltering(TasksFilterType.ALL_TASKS);
     }
 
-    public void start() {
-        loadTasks(false);
-    }
-
     public void loadTasks(boolean forceUpdate) {
+        if (forceUpdate){
+            mTasksRepository.refreshTasks();
+        }
+
         loadTasks(forceUpdate, true);
     }
 
@@ -227,10 +215,6 @@ public class TasksViewModel extends ViewModel {
     private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
             mDataLoading.setValue(true);
-        }
-        if (forceUpdate) {
-
-            mTasksRepository.refreshTasks();
         }
 
         mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {

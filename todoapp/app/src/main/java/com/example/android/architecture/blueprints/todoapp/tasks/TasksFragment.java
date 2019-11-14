@@ -214,7 +214,7 @@ public class TasksFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mTasksViewModel.start();
+        mTasksViewModel.loadTasks(false);
 
         if (getBatteryPercentage() > 99) {
             count += 1;
