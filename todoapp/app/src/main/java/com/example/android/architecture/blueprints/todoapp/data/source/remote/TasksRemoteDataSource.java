@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.remote;
 
 import android.os.Handler;
+
 import androidx.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -85,6 +86,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                int millis = SERVICE_LATENCY_IN_MILLIS;
                 callback.onTasksLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values()));
             }
         }, SERVICE_LATENCY_IN_MILLIS);
@@ -104,6 +106,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                int millis = SERVICE_LATENCY_IN_MILLIS;
                 callback.onTaskLoaded(task);
             }
         }, SERVICE_LATENCY_IN_MILLIS);

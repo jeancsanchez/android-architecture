@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 
@@ -26,6 +24,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.util.AppExecutors;
 
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
@@ -71,6 +71,8 @@ public class TasksLocalDataSource implements TasksDataSource {
                 mAppExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
+                        mAppExecutors.diskIO();
+
                         if (tasks.isEmpty()) {
                             // This will be called if the table is new or just empty.
                             callback.onDataNotAvailable();
@@ -99,6 +101,8 @@ public class TasksLocalDataSource implements TasksDataSource {
                 mAppExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
+                        mAppExecutors.diskIO();
+
                         if (task != null) {
                             callback.onTaskLoaded(task);
                         } else {

@@ -22,18 +22,20 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.LifecycleOwner;
+
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskItemBinding;
 
 import java.util.List;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.LifecycleOwner;
-
 
 public class TasksAdapter extends BaseAdapter {
 
     private final TasksViewModel mTasksViewModel;
+
+    private int currentItemId = 0;
 
     private List<Task> mTasks;
 
@@ -48,7 +50,8 @@ public class TasksAdapter extends BaseAdapter {
     }
 
     public void replaceData(List<Task> tasks) {
-        setList(tasks);
+        mTasks = tasks;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -63,7 +66,8 @@ public class TasksAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return position;
+        currentItemId = position;
+        return currentItemId;
     }
 
     @Override

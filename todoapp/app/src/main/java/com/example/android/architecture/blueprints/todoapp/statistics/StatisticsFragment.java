@@ -21,12 +21,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding;
-
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+
+import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding;
 
 /**
  * Main UI for the statistics screen.
@@ -61,10 +61,6 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mStatisticsViewModel.start();
-    }
-
-    public boolean isActive() {
-        return isAdded();
+        mStatisticsViewModel.loadStatistics();
     }
 }

@@ -16,13 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import com.example.android.architecture.blueprints.todoapp.Event;
-import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.arch.core.util.Function;
@@ -30,6 +23,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
+
+import com.example.android.architecture.blueprints.todoapp.Event;
+import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
 
 
 /**
@@ -57,8 +57,8 @@ public class TaskDetailViewModel extends ViewModel implements TasksDataSource.Ge
             new Function<Task, Boolean>() {
                 @Override
                 public Boolean apply(Task input) {
+                    TasksRepository tasksRepository = mTasksRepository;
                     return input.isCompleted();
-
                 }
             });
 

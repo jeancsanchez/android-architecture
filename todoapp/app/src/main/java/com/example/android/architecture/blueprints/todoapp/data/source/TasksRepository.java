@@ -164,7 +164,17 @@ public class TasksRepository implements TasksDataSource, TasksDataSource.TasksAc
     @Override
     public void completeTask(@NonNull String taskId) {
         checkNotNull(taskId);
-        completeTask(getTaskWithId(taskId));
+        Task task = getTaskWithId(taskId);
+        mTasksRemoteDataSource.completeTask(task);
+        mTasksLocalDataSource.completeTask(task);
+
+        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
+
+        // Do in memory cache update to keep the app UI up to date
+        if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
+        }
+        mCachedTasks.put(task.getId(), completedTask);
     }
 
     @Override
@@ -185,7 +195,17 @@ public class TasksRepository implements TasksDataSource, TasksDataSource.TasksAc
     @Override
     public void activateTask(@NonNull String taskId) {
         checkNotNull(taskId);
-        activateTask(getTaskWithId(taskId));
+        Task task = getTaskWithId(taskId);
+        mTasksRemoteDataSource.activateTask(task);
+        mTasksLocalDataSource.activateTask(task);
+
+        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
+
+        // Do in memory cache update to keep the app UI up to date
+        if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
+        }
+        mCachedTasks.put(task.getId(), activeTask);
     }
 
     @Override

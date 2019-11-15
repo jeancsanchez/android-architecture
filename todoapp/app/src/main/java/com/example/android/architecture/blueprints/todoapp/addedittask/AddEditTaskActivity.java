@@ -18,11 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.os.Bundle;
 
-import com.example.android.architecture.blueprints.todoapp.Event;
-import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
-import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +25,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+
+import com.example.android.architecture.blueprints.todoapp.Event;
+import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
+import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
 /**
  * Displays an add or edit task screen.
@@ -69,10 +69,7 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
         ActivityUtils.replaceFragmentInActivity(getSupportFragmentManager(),
                 addEditTaskFragment, R.id.contentFrame);
 
-        subscribeToNavigationChanges();
-    }
-
-    private void subscribeToNavigationChanges() {
+        // subscribe to navigation changes
         AddEditTaskViewModel viewModel = obtainViewModel(this);
 
         // The activity observes the navigation events in the ViewModel
@@ -85,6 +82,7 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
             }
         });
     }
+
 
     public static AddEditTaskViewModel obtainViewModel(FragmentActivity activity) {
         // Use a Factory to inject dependencies into the ViewModel

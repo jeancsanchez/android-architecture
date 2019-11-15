@@ -16,18 +16,18 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-
-import java.util.List;
-
 import androidx.databinding.Bindable;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import java.util.List;
 
 /**
  * Exposes the data to be used in the statistics screen.
@@ -57,10 +57,6 @@ public class StatisticsViewModel extends ViewModel {
 
     public StatisticsViewModel(TasksRepository tasksRepository) {
         mTasksRepository = tasksRepository;
-    }
-
-    public void start() {
-        loadStatistics();
     }
 
     public void loadStatistics() {
