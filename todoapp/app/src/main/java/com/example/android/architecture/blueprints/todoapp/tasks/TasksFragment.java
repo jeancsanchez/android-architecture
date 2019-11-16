@@ -74,7 +74,7 @@ public class TasksFragment extends Fragment {
     };
 
     private FloatingActionButton fab;
-    private int count = 1;
+    private int count = 0;
 
     public TasksFragment() {
         // Requires empty public constructor
