@@ -24,7 +24,6 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.google.common.collect.Lists;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -38,6 +37,9 @@ public class TasksRemoteDataSource implements TasksDataSource {
     private static final int SERVICE_LATENCY_IN_MILLIS = 2000;
 
     private final static Map<String, Task> TASKS_SERVICE_DATA;
+
+    private Handler mHandler;
+
 
     static {
         TASKS_SERVICE_DATA = new LinkedHashMap<>(2);
@@ -59,6 +61,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
         addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "18");
     }
 
+
     public static TasksRemoteDataSource getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new TasksRemoteDataSource();
@@ -67,7 +70,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     // Prevent direct instantiation.
-    private TasksRemoteDataSource() {}
+    private TasksRemoteDataSource() {
+    }
 
     private static void addTask(String title, String description, String id) {
         Task newTask = new Task(title, description, id);
@@ -82,12 +86,12 @@ public class TasksRemoteDataSource implements TasksDataSource {
     @Override
     public void getTasks(final @NonNull LoadTasksCallback callback) {
         // Simulate network by delaying the execution.
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        mHandler = new Handler();
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                int millis = SERVICE_LATENCY_IN_MILLIS;
                 callback.onTasksLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values()));
+                mHandler.removeCallbacksAndMessages(null);
             }
         }, SERVICE_LATENCY_IN_MILLIS);
     }
@@ -102,12 +106,12 @@ public class TasksRemoteDataSource implements TasksDataSource {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
 
         // Simulate network by delaying the execution.
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        mHandler = new Handler();
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                int millis = SERVICE_LATENCY_IN_MILLIS;
                 callback.onTaskLoaded(task);
+                mHandler.removeCallbacksAndMessages(null);
             }
         }, SERVICE_LATENCY_IN_MILLIS);
     }
@@ -131,11 +135,9 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void clearCompletedTasks() {
-        Iterator<Map.Entry<String, Task>> it = TASKS_SERVICE_DATA.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Task> entry = it.next();
-            if (entry.getValue().isCompleted()) {
-                it.remove();
+        for (Task task : TASKS_SERVICE_DATA.values()) {
+            if (task.isCompleted()) {
+                TASKS_SERVICE_DATA.remove(task);
             }
         }
     }

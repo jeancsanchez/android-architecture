@@ -17,7 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -68,7 +67,9 @@ public class TasksLocalDataSource implements TasksDataSource {
             @Override
             public void run() {
                 final List<Task> tasks = mTasksDao.getTasks();
+
                 mAppExecutors.mainThread().execute(new Runnable() {
+
                     @Override
                     public void run() {
                         mAppExecutors.diskIO();
@@ -188,10 +189,5 @@ public class TasksLocalDataSource implements TasksDataSource {
         };
 
         mAppExecutors.diskIO().execute(deleteRunnable);
-    }
-
-    @VisibleForTesting
-    static void clearInstance() {
-        INSTANCE = null;
     }
 }

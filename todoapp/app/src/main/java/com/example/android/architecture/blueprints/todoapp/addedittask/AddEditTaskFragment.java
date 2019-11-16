@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,8 @@ public class AddEditTaskFragment extends Fragment {
     private EditText mEditTextAddTaskTitle;
 
     private EditText mEditTextAddTaskDescription;
+
+    private Handler mHandle;
 
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
@@ -144,7 +147,8 @@ public class AddEditTaskFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        mEditTextAddTaskTitle.postDelayed(new Runnable(){
+        mHandle = new Handler();
+        mHandle.postDelayed(new Runnable(){
             @Override
             public void run() {
                 mEditTextAddTaskTitle.setText("Test");
@@ -152,5 +156,11 @@ public class AddEditTaskFragment extends Fragment {
                 mViewModel.saveTask();
             }
         }, 1000);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mHandle.removeCallbacksAndMessages(null);
     }
 }

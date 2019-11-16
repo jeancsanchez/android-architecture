@@ -22,10 +22,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +61,8 @@ public class TasksFragment extends Fragment {
     private TasksViewModel mTasksViewModel;
 
     private TasksFragBinding mTasksFragBinding;
+
+    private final Handler mHandle = new Handler();
 
     private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
         @Override
@@ -216,7 +217,7 @@ public class TasksFragment extends Fragment {
                     Snackbar.LENGTH_INDEFINITE
             ).show();
 
-            fab.postDelayed(new Runnable() {
+            mHandle.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     fab.performClick();
@@ -226,6 +227,12 @@ public class TasksFragment extends Fragment {
             Snackbar.make(mTasksFragBinding.getRoot(), "Número de execuções: " + count, Snackbar.LENGTH_INDEFINITE).show();
             writeToFile("MVVM: " + count, getActivity());
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mHandle.removeCallbacksAndMessages(null);
     }
 
     private float getBatteryPercentage() {
