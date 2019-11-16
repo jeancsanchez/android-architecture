@@ -62,14 +62,14 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void start() {
-        if (!isNewTask() && mIsDataMissing) {
+        if (!(mTaskId == null) && mIsDataMissing) {
             populateTask();
         }
     }
 
     @Override
     public void saveTask(String title, String description) {
-        if (isNewTask()) {
+        if (mTaskId == null) {
             createTask(title, description);
         } else {
             updateTask(title, description);
@@ -78,7 +78,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void populateTask() {
-        if (isNewTask()) {
+        if (mTaskId == null) {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
         mTasksRepository.getTask(mTaskId, this);
@@ -107,9 +107,6 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         return mIsDataMissing;
     }
 
-    private boolean isNewTask() {
-        return mTaskId == null;
-    }
 
     private void createTask(String title, String description) {
         Task newTask = new Task(title, description);
@@ -122,7 +119,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     private void updateTask(String title, String description) {
-        if (isNewTask()) {
+        if (mTaskId == null) {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
         mTasksRepository.saveTask(new Task(title, description, mTaskId));

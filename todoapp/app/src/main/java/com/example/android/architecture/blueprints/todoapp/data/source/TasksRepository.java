@@ -36,7 +36,7 @@ import java.util.Map;
  * obtained from the server, by using the remote data source only if the local database doesn't
  * exist or is empty.
  */
-public class TasksRepository implements TasksDataSource {
+public class TasksRepository implements TasksDataSource, TasksDataSource.TasksActions {
 
     private static TasksRepository INSTANCE = null;
 
@@ -77,13 +77,6 @@ public class TasksRepository implements TasksDataSource {
         return INSTANCE;
     }
 
-    /**
-     * Used to force {@link #getInstance(TasksDataSource, TasksDataSource)} to create a new instance
-     * next time it's called.
-     */
-    public static void destroyInstance() {
-        INSTANCE = null;
-    }
 
     /**
      * Gets tasks from cache, local data source (SQLite) or remote data source, whichever is
@@ -153,7 +146,33 @@ public class TasksRepository implements TasksDataSource {
     @Override
     public void completeTask(@NonNull String taskId) {
         checkNotNull(taskId);
-        completeTask(getTaskWithId(taskId));
+        Task task = getTaskWithId(taskId);
+        mTasksRemoteDataSource.completeTask(task);
+        mTasksLocalDataSource.completeTask(task);
+
+        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
+
+        // Do in memory cache update to keep the app UI up to date
+        if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
+        }
+        mCachedTasks.put(task.getId(), completedTask);
+    }
+
+    @Override
+    public void activateTask(@NonNull String taskId) {
+        checkNotNull(taskId);
+        Task task = getTaskWithId(taskId);
+        mTasksRemoteDataSource.activateTask(task);
+        mTasksLocalDataSource.activateTask(task);
+
+        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
+
+        // Do in memory cache update to keep the app UI up to date
+        if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
+        }
+        mCachedTasks.put(task.getId(), activeTask);
     }
 
     @Override
@@ -171,11 +190,6 @@ public class TasksRepository implements TasksDataSource {
         mCachedTasks.put(task.getId(), activeTask);
     }
 
-    @Override
-    public void activateTask(@NonNull String taskId) {
-        checkNotNull(taskId);
-        activateTask(getTaskWithId(taskId));
-    }
 
     @Override
     public void clearCompletedTasks() {

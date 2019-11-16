@@ -46,6 +46,16 @@ public interface TasksDataSource {
         void onDataNotAvailable();
     }
 
+
+    interface TasksActions {
+
+        void refreshTasks();
+
+        void activateTask(@NonNull String taskId);
+
+        void completeTask(@NonNull String taskId);
+    }
+
     void getTasks(@NonNull LoadTasksCallback callback);
 
     void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback);
@@ -54,15 +64,9 @@ public interface TasksDataSource {
 
     void completeTask(@NonNull Task task);
 
-    void completeTask(@NonNull String taskId);
-
     void activateTask(@NonNull Task task);
 
-    void activateTask(@NonNull String taskId);
-
     void clearCompletedTasks();
-
-    void refreshTasks();
 
     void deleteAllTasks();
 

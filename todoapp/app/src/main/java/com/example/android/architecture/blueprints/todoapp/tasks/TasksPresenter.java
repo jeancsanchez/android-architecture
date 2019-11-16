@@ -53,7 +53,9 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     @Override
     public void start() {
-        loadTasks(false);
+        // Simplification for sample: a network reload will be forced on first load.
+        loadTasks(false , true);
+        mFirstLoad = false;
     }
 
     @Override

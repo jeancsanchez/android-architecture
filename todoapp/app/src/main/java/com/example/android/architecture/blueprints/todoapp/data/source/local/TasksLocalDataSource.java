@@ -16,16 +16,15 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.AppExecutors;
 
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
@@ -71,6 +70,8 @@ public class TasksLocalDataSource implements TasksDataSource {
                 mAppExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
+                        mAppExecutors.diskIO();
+
                         if (tasks.isEmpty()) {
                             // This will be called if the table is new or just empty.
                             callback.onDataNotAvailable();
@@ -99,6 +100,8 @@ public class TasksLocalDataSource implements TasksDataSource {
                 mAppExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
+                        mAppExecutors.diskIO();
+
                         if (task != null) {
                             callback.onTaskLoaded(task);
                         } else {
@@ -137,12 +140,6 @@ public class TasksLocalDataSource implements TasksDataSource {
     }
 
     @Override
-    public void completeTask(@NonNull String taskId) {
-        // Not required for the local data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
-    }
-
-    @Override
     public void activateTask(@NonNull final Task task) {
         Runnable activateRunnable = new Runnable() {
             @Override
@@ -153,11 +150,6 @@ public class TasksLocalDataSource implements TasksDataSource {
         mAppExecutors.diskIO().execute(activateRunnable);
     }
 
-    @Override
-    public void activateTask(@NonNull String taskId) {
-        // Not required for the local data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
-    }
 
     @Override
     public void clearCompletedTasks() {
@@ -170,12 +162,6 @@ public class TasksLocalDataSource implements TasksDataSource {
         };
 
         mAppExecutors.diskIO().execute(clearTasksRunnable);
-    }
-
-    @Override
-    public void refreshTasks() {
-        // Not required because the {@link TasksRepository} handles the logic of refreshing the
-        // tasks from all the available data sources.
     }
 
     @Override
@@ -200,10 +186,5 @@ public class TasksLocalDataSource implements TasksDataSource {
         };
 
         mAppExecutors.diskIO().execute(deleteRunnable);
-    }
-
-    @VisibleForTesting
-    static void clearInstance() {
-        INSTANCE = null;
     }
 }

@@ -16,13 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.base.Strings;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -51,10 +51,6 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     @Override
     public void start() {
-        openTask();
-    }
-
-    private void openTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
             mTaskDetailView.showMissingTask();
             return;

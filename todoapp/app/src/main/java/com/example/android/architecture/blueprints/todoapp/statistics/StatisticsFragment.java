@@ -37,6 +37,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     private TextView mStatisticsTV;
 
     private StatisticsContract.Presenter mPresenter;
+    private boolean isAdded = false;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
@@ -60,6 +61,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     public void onResume() {
         super.onResume();
         mPresenter.start();
+        isAdded = true;
     }
 
     @Override
@@ -88,8 +90,15 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
         mStatisticsTV.setText(getResources().getString(R.string.statistics_error));
     }
 
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        isAdded = false;
+    }
+
     @Override
     public boolean isActive() {
-        return isAdded();
+        return isAdded;
     }
 }

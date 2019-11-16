@@ -16,15 +16,15 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 
 /**
  * Implementation of a remote data source with static access to the data for easy testing.
@@ -67,20 +67,11 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
         TASKS_SERVICE_DATA.put(task.getId(), completedTask);
     }
 
-    @Override
-    public void completeTask(@NonNull String taskId) {
-        // Not required for the remote data source.
-    }
 
     @Override
     public void activateTask(@NonNull Task task) {
         Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
         TASKS_SERVICE_DATA.put(task.getId(), activeTask);
-    }
-
-    @Override
-    public void activateTask(@NonNull String taskId) {
-        // Not required for the remote data source.
     }
 
     @Override

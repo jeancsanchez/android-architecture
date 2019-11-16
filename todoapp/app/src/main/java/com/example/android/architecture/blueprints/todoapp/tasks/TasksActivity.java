@@ -126,9 +126,4 @@ public class TasksActivity extends AppCompatActivity {
                     }
                 });
     }
-
-    @VisibleForTesting
-    public IdlingResource getCountingIdlingResource() {
-        return EspressoIdlingResource.getIdlingResource();
-    }
 }

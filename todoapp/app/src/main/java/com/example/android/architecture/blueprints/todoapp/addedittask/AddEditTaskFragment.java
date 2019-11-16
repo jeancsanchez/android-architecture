@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,12 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     private TextView mDescription;
 
+    private Handler mHandle;
+    private boolean isAdded;
+
+    private Activity activity;
+
+
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
     }
@@ -61,6 +68,12 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void setPresenter(@NonNull AddEditTaskContract.Presenter presenter) {
         mPresenter = checkNotNull(presenter);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        activity = getActivity();
     }
 
     @Override
@@ -85,6 +98,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         mTitle = (TextView) root.findViewById(R.id.add_task_title);
         mDescription = (TextView) root.findViewById(R.id.add_task_description);
         setHasOptionsMenu(true);
+        activity = getActivity();
         return root;
     }
 
@@ -95,8 +109,10 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     @Override
     public void showTasksList() {
-        getActivity().setResult(Activity.RESULT_OK);
-        getActivity().finish();
+        if (activity != null) {
+            activity.setResult(Activity.RESULT_OK);
+            activity.finish();
+        }
     }
 
     @Override
@@ -111,21 +127,35 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     @Override
     public boolean isActive() {
-        return isAdded();
+        return isAdded;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        isAdded = false;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         mPresenter.start();
+        isAdded = true;
 
-        fab.postDelayed(new Runnable() {
+        mHandle = new Handler();
+        mHandle.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mTitle.setText("Test");
                 mDescription.setText("Test");
                 fab.performClick();
             }
-        }, 2000);
+        }, 1000);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mHandle.removeCallbacksAndMessages(null);
     }
 }

@@ -59,6 +59,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     private TextView mDetailDescription;
 
     private CheckBox mDetailCompleteStatus;
+    private boolean isAdded = false;
+
+    private Activity activity;
 
     public static TaskDetailFragment newInstance(@Nullable String taskId) {
         Bundle arguments = new Bundle();
@@ -72,6 +75,13 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     public void onResume() {
         super.onResume();
         mPresenter.start();
+        isAdded = true;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        activity = getActivity();
     }
 
     @Nullable
@@ -95,6 +105,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
             }
         });
 
+        activity = getActivity();
         return root;
     }
 
@@ -162,25 +173,33 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     @Override
     public void showEditTask(@NonNull String taskId) {
-        Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
-        startActivityForResult(intent, REQUEST_EDIT_TASK);
+        if (activity != null){
+            Intent intent = new Intent(activity, AddEditTaskActivity.class);
+            intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
+            startActivityForResult(intent, REQUEST_EDIT_TASK);
+        }
     }
 
     @Override
     public void showTaskDeleted() {
-        getActivity().finish();
+        if (activity != null) {
+            activity.finish();
+        }
     }
 
     public void showTaskMarkedComplete() {
-        Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
-                .show();
+        if (activity != null) {
+            Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
+                    .show();
+        }
     }
 
     @Override
     public void showTaskMarkedActive() {
-        Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
-                .show();
+        if (activity != null) {
+            Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
+                    .show();
+        }
     }
 
     @Override
@@ -188,7 +207,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         if (requestCode == REQUEST_EDIT_TASK) {
             // If the task was edited successfully, go back to the list.
             if (resultCode == Activity.RESULT_OK) {
-                getActivity().finish();
+                if (activity != null) {
+                    activity.finish();
+                }
             }
         }
     }
@@ -206,8 +227,14 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        isAdded = false;
+    }
+
+    @Override
     public boolean isActive() {
-        return isAdded();
+        return isAdded;
     }
 
 }

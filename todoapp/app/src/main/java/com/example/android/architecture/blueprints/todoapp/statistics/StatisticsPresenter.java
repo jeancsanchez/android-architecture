@@ -47,10 +47,6 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
 
     @Override
     public void start() {
-        loadStatistics();
-    }
-
-    private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
         // The network request might be handled in a different thread so make sure Espresso knows

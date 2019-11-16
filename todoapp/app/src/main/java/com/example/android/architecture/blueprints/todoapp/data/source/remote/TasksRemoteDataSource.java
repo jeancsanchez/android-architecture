@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.remote;
 
 import android.os.Handler;
+
 import androidx.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -38,6 +39,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     private final static Map<String, Task> TASKS_SERVICE_DATA;
 
+    private Handler handler;
+
     static {
         TASKS_SERVICE_DATA = new LinkedHashMap<>(2);
         addTask("Build tower in Pisa", "Ground looks good, no foundation work required.");
@@ -52,7 +55,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     // Prevent direct instantiation.
-    private TasksRemoteDataSource() {}
+    private TasksRemoteDataSource() {
+    }
 
     private static void addTask(String title, String description) {
         Task newTask = new Task(title, description);
@@ -67,11 +71,12 @@ public class TasksRemoteDataSource implements TasksDataSource {
     @Override
     public void getTasks(final @NonNull LoadTasksCallback callback) {
         // Simulate network by delaying the execution.
-        Handler handler = new Handler();
+        handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 callback.onTasksLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values()));
+                handler.removeCallbacksAndMessages(null);
             }
         }, SERVICE_LATENCY_IN_MILLIS);
     }
@@ -86,11 +91,12 @@ public class TasksRemoteDataSource implements TasksDataSource {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
 
         // Simulate network by delaying the execution.
-        Handler handler = new Handler();
+        handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 callback.onTaskLoaded(task);
+                handler.removeCallbacksAndMessages(null);
             }
         }, SERVICE_LATENCY_IN_MILLIS);
     }
@@ -106,11 +112,6 @@ public class TasksRemoteDataSource implements TasksDataSource {
         TASKS_SERVICE_DATA.put(task.getId(), completedTask);
     }
 
-    @Override
-    public void completeTask(@NonNull String taskId) {
-        // Not required for the remote data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
-    }
 
     @Override
     public void activateTask(@NonNull Task task) {
@@ -118,27 +119,14 @@ public class TasksRemoteDataSource implements TasksDataSource {
         TASKS_SERVICE_DATA.put(task.getId(), activeTask);
     }
 
-    @Override
-    public void activateTask(@NonNull String taskId) {
-        // Not required for the remote data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
-    }
 
     @Override
     public void clearCompletedTasks() {
-        Iterator<Map.Entry<String, Task>> it = TASKS_SERVICE_DATA.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Task> entry = it.next();
-            if (entry.getValue().isCompleted()) {
-                it.remove();
+        for (Task task: TASKS_SERVICE_DATA.values()){
+            if (task.isCompleted()) {
+                TASKS_SERVICE_DATA.remove(task);
             }
         }
-    }
-
-    @Override
-    public void refreshTasks() {
-        // Not required because the {@link TasksRepository} handles the logic of refreshing the
-        // tasks from all the available data sources.
     }
 
     @Override
