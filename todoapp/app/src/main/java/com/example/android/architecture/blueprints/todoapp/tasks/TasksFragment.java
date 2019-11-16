@@ -86,10 +86,10 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     private Activity activity;
 
     private View root;
-    private Handler mHandle;
+    private Handler mHandle = new Handler();
     private float startBattery;
     private Intent batteryStatus;
-    private int count = 1;
+    private int count = 0;
     private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -271,7 +271,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         srl = getView().findViewById(R.id.refresh_layout);
 
         // Make sure setRefreshing() is called after the layout is done with everything else.
-        mHandle = new Handler();
         mHandle.post(new Runnable() {
             @Override
             public void run() {
@@ -491,7 +490,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             }, 1000);
         } else {
             Snackbar.make(root, "Total de execuções: " + count, Snackbar.LENGTH_INDEFINITE).show();
-            writeToFile("MVP: " + count, getActivity());
+//            writeToFile("MVP: " + count, getActivity());
         }
     }
 
