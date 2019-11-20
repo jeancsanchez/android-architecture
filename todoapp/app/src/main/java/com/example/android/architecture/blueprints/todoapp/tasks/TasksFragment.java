@@ -64,15 +64,20 @@ public class TasksFragment extends Fragment {
 
     private final Handler mHandle = new Handler();
 
+    private boolean canCountExecutions = false;
     private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() != null && intent.getAction().equals(ACTION_BATTERY_CHANGED)) {
                 batteryStatus = intent;
+                int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+                float batteryPct = (level / (float) scale) * 100;
+                canCountExecutions = batteryPct == 99;
+                startTests();
             }
         }
     };
-
     private FloatingActionButton fab;
     private int count = 0;
 
@@ -208,8 +213,18 @@ public class TasksFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mTasksViewModel.loadTasks(false);
+        startTests();
+    }
 
-        if (getBatteryPercentage() > 99) {
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mHandle.removeCallbacksAndMessages(null);
+    }
+
+    private void startTests() {
+        if (canCountExecutions) {
             count += 1;
             Snackbar.make(
                     mTasksFragBinding.getRoot(),
@@ -225,21 +240,8 @@ public class TasksFragment extends Fragment {
             }, 1000);
         } else {
             Snackbar.make(mTasksFragBinding.getRoot(), "Número de execuções: " + count, Snackbar.LENGTH_INDEFINITE).show();
-            writeToFile("MVVM: " + count, getActivity());
+//            writeToFile("MVVM: " + count, getActivity());
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mHandle.removeCallbacksAndMessages(null);
-    }
-
-    private float getBatteryPercentage() {
-        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-        return (level / (float) scale) * 100;
     }
 
 
