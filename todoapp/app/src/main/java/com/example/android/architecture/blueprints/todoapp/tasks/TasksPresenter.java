@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.app.Activity;
+
 import androidx.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -54,7 +55,7 @@ public class TasksPresenter implements TasksContract.Presenter {
     @Override
     public void start() {
         // Simplification for sample: a network reload will be forced on first load.
-        loadTasks(false , true);
+        loadTasks(false, false);
         mFirstLoad = false;
     }
 

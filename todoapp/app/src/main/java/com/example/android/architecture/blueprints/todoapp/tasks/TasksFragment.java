@@ -87,14 +87,19 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     private View root;
     private Handler mHandle = new Handler();
-    private float startBattery;
     private Intent batteryStatus;
     private int count = 0;
+    private boolean canCountExecutions = false;
     private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() != null && intent.getAction().equals(ACTION_BATTERY_CHANGED)) {
                 batteryStatus = intent;
+                int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+                float batteryPct = (level / (float) scale) * 100;
+                canCountExecutions = batteryPct == 99;
+                startTests();
             }
         }
     };
@@ -190,9 +195,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         batteryStatus = getActivity().registerReceiver(batteryReceiver, new IntentFilter(ACTION_BATTERY_CHANGED));
-        startBattery = getBatteryPercentage();
     }
 
     @Override
@@ -477,10 +480,17 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         super.onResume();
         mPresenter.start();
         isAdded = true;
+        startTests();
+    }
 
-        if (getBatteryPercentage() > 99) {
+    private void startTests() {
+        if (canCountExecutions) {
             count += 1;
-            Snackbar.make(root, "Execução número: " + count, Snackbar.LENGTH_INDEFINITE).show();
+            Snackbar.make(
+                    root,
+                    "Execução número: " + count,
+                    Snackbar.LENGTH_INDEFINITE
+            ).show();
 
             mHandle.postDelayed(new Runnable() {
                 @Override
@@ -489,16 +499,9 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 }
             }, 1000);
         } else {
-            Snackbar.make(root, "Total de execuções: " + count, Snackbar.LENGTH_INDEFINITE).show();
-//            writeToFile("MVP: " + count, getActivity());
+            Snackbar.make(root, "Número de execuções: " + count, Snackbar.LENGTH_INDEFINITE).show();
+//            writeToFile("MVVM: " + count, getActivity());
         }
-    }
-
-    private float getBatteryPercentage() {
-        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-        return (level / (float) scale) * 100;
     }
 
     private static void writeToFile(String data, Context context) {
