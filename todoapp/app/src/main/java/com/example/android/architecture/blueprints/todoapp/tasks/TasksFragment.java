@@ -101,8 +101,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     private String startTempo;
     private String finalTempo;
     private int count = 0;
-    private SimpleDateFormat format = new SimpleDateFormat("HH:MM:ss", Locale.getDefault());
-
+    private SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
 
     private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
         @Override
@@ -112,13 +111,15 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 finalBateria = getBatteryPct();
                 finalTempo = format.format(new Date());
 
-                String data = inicialBateria + "," + finalBateria + "," + count + "," + startTempo + "," + finalTempo + "\n";
-                writeToFile(data, context);
+                if (finalBateria < inicialBateria) {
+                    String data = inicialBateria + "," + finalBateria + "," + count + "," + startTempo + "," + finalTempo + "\n";
+                    writeToFile(data, context);
 
-                count = 0;
-                inicialBateria = finalBateria;
-                startTempo = finalTempo;
-                mPresenter.clearAllTasks();
+                    count = 0;
+                    inicialBateria = finalBateria;
+                    startTempo = finalTempo;
+                    mPresenter.clearAllTasks();
+                }
             }
         }
     };
