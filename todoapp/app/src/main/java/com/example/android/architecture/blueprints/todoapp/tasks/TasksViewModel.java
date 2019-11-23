@@ -76,7 +76,7 @@ public class TasksViewModel extends ViewModel {
     }
 
     public void loadTasks(boolean forceUpdate) {
-        if (forceUpdate){
+        if (forceUpdate) {
             mTasksRepository.refreshTasks();
         }
 
@@ -259,4 +259,7 @@ public class TasksViewModel extends ViewModel {
         });
     }
 
+    public void clearAllTasks() {
+        mTasksRepository.deleteAllTasks();
+    }
 }

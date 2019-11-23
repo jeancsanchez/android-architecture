@@ -16,14 +16,16 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +34,7 @@ import android.widget.ListView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -43,11 +46,13 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import static android.content.Intent.ACTION_BATTERY_CHANGED;
 
@@ -56,30 +61,40 @@ import static android.content.Intent.ACTION_BATTERY_CHANGED;
  */
 public class TasksFragment extends Fragment {
 
-    private Intent batteryStatus;
-
     private TasksViewModel mTasksViewModel;
 
     private TasksFragBinding mTasksFragBinding;
 
     private final Handler mHandle = new Handler();
 
-    private boolean canCountExecutions = false;
+    private Intent batteryStatus;
+    private float inicialBateria;
+    private float finalBateria;
+    private String startTempo;
+    private String finalTempo;
+    private int count = 0;
+    private SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
     private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() != null && intent.getAction().equals(ACTION_BATTERY_CHANGED)) {
                 batteryStatus = intent;
-                int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-                float batteryPct = (level / (float) scale) * 100;
-                canCountExecutions = batteryPct == 99;
-                startTests();
+                finalBateria = getBatteryPct();
+                finalTempo = format.format(new Date());
+
+                if (finalBateria < inicialBateria) {
+                    String data = inicialBateria + "," + finalBateria + "," + count + "," + startTempo + "," + finalTempo + "\n";
+                    writeToFile(data, context);
+
+                    count = 0;
+                    inicialBateria = finalBateria;
+                    startTempo = finalTempo;
+                    mTasksViewModel.clearAllTasks();
+                }
             }
         }
     };
     private FloatingActionButton fab;
-    private int count = 0;
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -122,19 +137,23 @@ public class TasksFragment extends Fragment {
         return true;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    private static void writeToFile(String data, Context context) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
 
-        setupSnackbar();
+            ActivityCompat.requestPermissions((Activity) context,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
-        setupFab();
+            return;
+        }
 
-        setupListAdapter();
-
-        setupRefreshLayout();
-
-        batteryStatus = getActivity().registerReceiver(batteryReceiver, new IntentFilter(ACTION_BATTERY_CHANGED));
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("results_mvvm.txt", Context.MODE_APPEND));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupSnackbar() {
@@ -223,39 +242,37 @@ public class TasksFragment extends Fragment {
         mHandle.removeCallbacksAndMessages(null);
     }
 
-    private void startTests() {
-        if (canCountExecutions) {
-            count += 1;
-            Snackbar.make(
-                    mTasksFragBinding.getRoot(),
-                    "Execução número: " + count,
-                    Snackbar.LENGTH_INDEFINITE
-            ).show();
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-            mHandle.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    fab.performClick();
-                }
-            }, 1000);
-        } else {
-            Snackbar.make(mTasksFragBinding.getRoot(), "Número de execuções: " + count, Snackbar.LENGTH_INDEFINITE).show();
-//            writeToFile("MVVM: " + count, getActivity());
-        }
+        setupSnackbar();
+
+        setupFab();
+
+        setupListAdapter();
+
+        setupRefreshLayout();
+
+        batteryStatus = getActivity().registerReceiver(batteryReceiver, new IntentFilter(ACTION_BATTERY_CHANGED));
+        count = 0;
+        inicialBateria = 100;
+        startTempo = format.format(new Date());
     }
 
+    private void startTests() {
+        count += 1;
+        mHandle.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                fab.performClick();
+            }
+        }, 1000);
+    }
 
-    private static void writeToFile(String data, Context context) {
-        /*-  registrar o tempo levado para executar todas
-        -  gráfico excucoes x bateria
-        -  gráfico tempo x bateria
-        -  gráfico execucoes x tempo*/
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
-        } catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
+    private float getBatteryPct() {
+        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        return (level / (float) scale) * 100;
     }
 }
