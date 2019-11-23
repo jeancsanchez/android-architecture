@@ -231,6 +231,12 @@ public class TasksPresenter implements TasksContract.Presenter {
         mCurrentFiltering = requestType;
     }
 
+
+    @Override
+    public void clearAllTasks() {
+        mTasksRepository.deleteAllTasks();
+    }
+
     @Override
     public TasksFilterType getFiltering() {
         return mCurrentFiltering;

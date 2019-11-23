@@ -16,15 +16,16 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +42,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -54,8 +56,11 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static android.content.Intent.ACTION_BATTERY_CHANGED;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -87,24 +92,36 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     private View root;
     private Handler mHandle = new Handler();
+    private static SwipeRefreshLayout srl;
+    private boolean isAdded;
+
     private Intent batteryStatus;
+    private float inicialBateria;
+    private float finalBateria;
+    private String startTempo;
+    private String finalTempo;
     private int count = 0;
-    private boolean canCountExecutions = false;
+    private SimpleDateFormat format = new SimpleDateFormat("HH:MM:ss", Locale.getDefault());
+
+
     private BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() != null && intent.getAction().equals(ACTION_BATTERY_CHANGED)) {
                 batteryStatus = intent;
-                int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-                float batteryPct = (level / (float) scale) * 100;
-                canCountExecutions = batteryPct == 99;
-                startTests();
+                finalBateria = getBatteryPct();
+                finalTempo = format.format(new Date());
+
+                String data = inicialBateria + "," + finalBateria + "," + count + "," + startTempo + "," + finalTempo + "\n";
+                writeToFile(data, context);
+
+                count = 0;
+                inicialBateria = finalBateria;
+                startTempo = finalTempo;
+                mPresenter.clearAllTasks();
             }
         }
     };
-    private boolean isAdded;
-    private static SwipeRefreshLayout srl;
 
 
     public TasksFragment() {
@@ -192,10 +209,23 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         return root;
     }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        batteryStatus = getActivity().registerReceiver(batteryReceiver, new IntentFilter(ACTION_BATTERY_CHANGED));
+    private static void writeToFile(String data, Context context) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions((Activity) context,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+
+            return;
+        }
+
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("results.txt", Context.MODE_APPEND));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -483,35 +513,30 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         startTests();
     }
 
-    private void startTests() {
-        if (canCountExecutions) {
-            count += 1;
-            Snackbar.make(
-                    root,
-                    "Execução número: " + count,
-                    Snackbar.LENGTH_INDEFINITE
-            ).show();
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-            mHandle.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    fab.performClick();
-                }
-            }, 1000);
-        } else {
-            Snackbar.make(root, "Número de execuções: " + count, Snackbar.LENGTH_INDEFINITE).show();
-//            writeToFile("MVVM: " + count, getActivity());
-        }
+        batteryStatus = getActivity().registerReceiver(batteryReceiver, new IntentFilter(ACTION_BATTERY_CHANGED));
+        count = 0;
+        inicialBateria = 100;
+        startTempo = format.format(new Date());
     }
 
-    private static void writeToFile(String data, Context context) {
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("results.txt", Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
-        } catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
+    private void startTests() {
+        count += 1;
+        mHandle.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                fab.performClick();
+            }
+        }, 1000);
+    }
+
+    private float getBatteryPct() {
+        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        return (level / (float) scale) * 100;
     }
 
     public interface TaskItemListener {
