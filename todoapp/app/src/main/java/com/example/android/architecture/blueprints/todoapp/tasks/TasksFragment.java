@@ -79,18 +79,23 @@ public class TasksFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() != null && intent.getAction().equals(ACTION_BATTERY_CHANGED)) {
                 batteryStatus = intent;
-                finalBateria = getBatteryPct();
+                float currentBattery = getBatteryPct();
+
+                if (inicialBateria == currentBattery) {
+                    return;
+                }
+
+                finalBateria = currentBattery;
                 finalTempo = format.format(new Date());
 
-                if (finalBateria < inicialBateria) {
-                    String data = inicialBateria + "," + finalBateria + "," + count + "," + startTempo + "," + finalTempo + "\n";
-                    writeToFile(data, context);
 
-                    count = 0;
-                    inicialBateria = finalBateria;
-                    startTempo = finalTempo;
-                    mTasksViewModel.clearAllTasks();
-                }
+                String data = inicialBateria + "," + finalBateria + "," + count + "," + startTempo + "," + finalTempo + "\n";
+                writeToFile(data, context);
+
+                count = 0;
+                inicialBateria = finalBateria;
+                startTempo = finalTempo;
+                mTasksViewModel.clearAllTasks();
             }
         }
     };
