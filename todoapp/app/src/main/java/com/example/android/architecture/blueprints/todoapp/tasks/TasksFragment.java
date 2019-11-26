@@ -124,7 +124,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 count = 0;
                 inicialBateria = finalBateria;
                 startTempo = finalTempo;
-                mPresenter.clearAllTasks();
             }
         }
     };
