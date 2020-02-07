@@ -130,12 +130,17 @@ public class TasksFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        batteryStatus = getActivity().registerReceiver(batteryReceiver, new IntentFilter(ACTION_BATTERY_CHANGED));
+        count = 0;
+        inicialBateria = 100;
+        startTempo = format.format(new Date());
+
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions((Activity) getContext(),
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-
         }
     }
 
@@ -262,11 +267,6 @@ public class TasksFragment extends Fragment {
         setupListAdapter();
 
         setupRefreshLayout();
-
-        batteryStatus = getActivity().registerReceiver(batteryReceiver, new IntentFilter(ACTION_BATTERY_CHANGED));
-        count = 0;
-        inicialBateria = 100;
-        startTempo = format.format(new Date());
     }
 
     private void startTests() {
