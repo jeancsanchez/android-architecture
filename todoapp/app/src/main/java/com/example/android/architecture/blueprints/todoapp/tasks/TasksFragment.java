@@ -215,16 +215,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         return root;
     }
 
+
     private static void writeToFile(String data, Context context) {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions((Activity) context,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-
-            return;
-        }
-
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("results.txt", Context.MODE_APPEND));
             outputStreamWriter.write(data);
@@ -527,6 +519,14 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         count = 0;
         inicialBateria = 100;
         startTempo = format.format(new Date());
+
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions((Activity) getContext(),
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+
+        }
     }
 
     private void startTests() {
