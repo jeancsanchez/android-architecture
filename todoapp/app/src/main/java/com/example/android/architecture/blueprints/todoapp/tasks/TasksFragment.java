@@ -96,7 +96,6 @@ public class TasksFragment extends Fragment {
                 count = 0;
                 inicialBateria = finalBateria;
                 startTempo = finalTempo;
-                mTasksViewModel.clearAllTasks();
             }
         }
     };
